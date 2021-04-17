@@ -7,7 +7,7 @@ namespace ProblemsPractice
     {
         static void Main(string[] args)
         {
-            var cls = new DepthOfParenthesis();
+            var cls = new To_Lower_Case();
 
             string j = "aA";
             string s = "LLLLRRRR";
@@ -21,11 +21,11 @@ namespace ProblemsPractice
             {
                 3,4,4
             };
-            string str = "ab";
+            string str = "AbCdE";
             string s2 = "c";
 
-            //var a = cls.MaxDepth(str);
-            Console.WriteLine(str + s2);
+            var a = cls.ToLowerCase(str);
+            Console.WriteLine(a);
         }
     }
 }
