@@ -7,24 +7,27 @@ namespace ProblemsPractice
     {
         static void Main(string[] args)
         {
-            var cls = new To_Lower_Case();
+            
 
             string j = "aA";
             string s = "LLLLRRRR";
 
-            var gas = new int[]
+            var simpleArray = new int[]
             {
-                3,3,4
+                3,1,2,4
             };
 
-            var cost = new int[]
+            var twoDimensionalJaggedArray = new int[][]
             {
-                3,4,4
+                new int[] {5,8,2},
+                new int[] {3,9,2},
+                new int[] {5,12,2}
             };
-            string str = "AbCdE";
+            string str = "MCMXCIV";
             string s2 = "c";
 
-            var a = cls.ToLowerCase(str);
+            var cls = new Longest_Common_Prefix();
+            var a = cls.LongestCommonPrefix(new string[] { "flower", "flow", "floight" });
             Console.WriteLine(a);
         }
     }
