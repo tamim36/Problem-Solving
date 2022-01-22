@@ -32,7 +32,8 @@ namespace ProblemsPractice.Contests
 
         public int NumOfPairs(string[] nums, string target)
         {
-            var lenNums = 
+            var lenNum = 4;
+            return lenNum;
         }
     }
 }
