@@ -67,7 +67,7 @@ namespace ProblemsPractice
                 Console.WriteLine(cls.Next(num2[i]));
             }
             */
-            var a = cls.SumSubarrayMinsOptimized(num1);
+            var a = cls.SumSubarrayMins(num1);
 
             Console.WriteLine(a);
         }
