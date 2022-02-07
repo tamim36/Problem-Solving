@@ -11,6 +11,8 @@ using System.Linq;
 using ProblemsPractice.LinkedList;
 using ProblemsPractice.Stack;
 using ProblemsPractice.PrefixSum;
+using ProblemsPractice.Queue;
+using System.Reflection;
 
 namespace ProblemsPractice
 {
@@ -60,16 +62,32 @@ namespace ProblemsPractice
             String s5= "212333";
             String answer = "";
             
-            var cls = new Sum_of_Subarray_Minimums();
+            var cls = new Find_the_Winner_of_the_Circular_Game();
             /*
             for (int i=0; i < num2.Length; i++)
             {
                 Console.WriteLine(cls.Next(num2[i]));
             }
             */
-            var a = cls.SumSubarrayMins(num1);
+            //DesignProblemsCalling(new string[0], new int[0]);
+        }
 
-            Console.WriteLine(a);
+        static void DesignProblemsCalling(string[] Methods, int[] Params)
+        {
+            string Path = @"D:\WorkStation\Problem-Solving\LeetCode\ProblemsPractice\bin\Debug\netcoreapp3.1\ProblemsPractice.dll";
+
+            Assembly assembly = Assembly.LoadFrom(Path);
+            Type type = assembly.GetTypes().Where(x => x.Name == "MyCircularDeque").FirstOrDefault();
+
+            var clsParams = new object[] {3};
+            var cls = Activator.CreateInstance(type, clsParams);
+
+            var mParam = new object[] {1};
+            string methodName = "insertLast";
+            methodName = string.Concat(methodName[0].ToString().ToUpper(), methodName.AsSpan(1));
+            var method = type.GetMethod(methodName);
+            var res = method.Invoke(cls, mParam);
+
         }
     }
 }
