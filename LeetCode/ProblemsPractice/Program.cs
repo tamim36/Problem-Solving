@@ -25,7 +25,7 @@ namespace ProblemsPractice
 
             var num1 = new int[]
             {
-                3,1,2,4,2
+                5,49,26,45,13,27,74,87,56,76,25,64
             };
 
             var stAr = new string[]
@@ -62,13 +62,11 @@ namespace ProblemsPractice
             String s5= "212333";
             String answer = "";
             
-            var cls = new Find_the_Winner_of_the_Circular_Game();
-            /*
-            for (int i=0; i < num2.Length; i++)
-            {
-                Console.WriteLine(cls.Next(num2[i]));
-            }
-            */
+            var cls = new Biweekly_Contest_72();
+
+            var a = cls.SumOfThree(3);
+            Console.WriteLine(a);
+            
             //DesignProblemsCalling(new string[0], new int[0]);
         }
 
