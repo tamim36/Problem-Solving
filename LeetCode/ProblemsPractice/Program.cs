@@ -13,6 +13,7 @@ using ProblemsPractice.Stack;
 using ProblemsPractice.PrefixSum;
 using ProblemsPractice.Queue;
 using System.Reflection;
+using ProblemsPractice.BST;
 
 namespace ProblemsPractice
 {
@@ -25,7 +26,7 @@ namespace ProblemsPractice
 
             var num1 = new int[]
             {
-                5,49,26,45,13,27,74,87,56,76,25,64
+                3,8,20
             };
 
             var stAr = new string[]
@@ -35,21 +36,22 @@ namespace ProblemsPractice
 
             var num2 = new int[]
             {
-               100,80,60,70,60,75,85
+               789,456,123
             };
 
             var twoDimensionalJaggedArray = new int[][]
             {
-                new int[] {1,2,3},
-                new int[] {4,5,6},
-                new int[] {7,8,9}
+                new int[] {7,1,4,5,6},
+                new int[] { 2, 5, 1, 6, 4 },
+                new int[] { 1, 5, 4, 3, 2 },
+                new int[] { 1, 2, 7, 3, 4 }
             };
             string str = "1 box has 3 blue 4 red 6 green and 12 yellow marbles";
             string s2 = "p#######";
             var strAra = new string[] { "flower", "flow", "floight" };
 
             // Linked List
-            var head = new ListNode(7);
+            var head = new ListNode(0);
             MyLinkedList.AppendToLinkedList(num1, head);
             //MyLinkedList.PrintListNode(head);
 
@@ -62,10 +64,37 @@ namespace ProblemsPractice
             String s5= "212333";
             String answer = "";
             
-            var cls = new Biweekly_Contest_72();
+            var cls = new TreeTraversal();
 
-            var a = cls.SumOfThree(3);
-            Console.WriteLine(a);
+
+            //var a = cls.LargestMagicSquare(twoDimensionalJaggedArray);
+            //Console.WriteLine(a);
+            //MyLinkedList.PrintListNode(a);
+            //Console.WriteLine(a);
+            /*
+            BinarySearchTree bst = new BinarySearchTree();
+            bst.Insert(9);
+            bst.Insert(4);
+            bst.Insert(6);
+            bst.Insert(20);
+            bst.Insert(170);
+            bst.Insert(15);
+            bst.Insert(1);
+            bst.LookUp(15);
+            bst.print2DUtil(bst.Root, 0);
+            bst.Remove(20);
+            bst.print2DUtil(bst.Root, 0);*/
+
+            TreeNode root = new TreeNode(3);
+            root.left = new TreeNode(9);
+
+            root.right = new TreeNode(20);
+            root.right.left = new TreeNode(15);
+            root.right.right = new TreeNode(7);
+
+            var bst = new Binary_Tree_Zigzag_Level_Order_Traversal();
+
+            var a = bst.ZigzagLevelOrder(root);
             
             //DesignProblemsCalling(new string[0], new int[0]);
         }
