@@ -14,6 +14,8 @@ using ProblemsPractice.PrefixSum;
 using ProblemsPractice.Queue;
 using System.Reflection;
 using ProblemsPractice.BST;
+using ProblemsPractice.Recursion;
+using ProblemsPractice.Sorting;
 
 namespace ProblemsPractice
 {
@@ -26,7 +28,7 @@ namespace ProblemsPractice
 
             var num1 = new int[]
             {
-                3,8,20
+                8,5,1,7,10,12
             };
 
             var stAr = new string[]
@@ -85,16 +87,30 @@ namespace ProblemsPractice
             bst.Remove(20);
             bst.print2DUtil(bst.Root, 0);*/
 
-            TreeNode root = new TreeNode(3);
-            root.left = new TreeNode(9);
+            TreeNode root = new TreeNode(1);
+            root.left = new TreeNode(2);
+            root.right = new TreeNode(3);
 
-            root.right = new TreeNode(20);
-            root.right.left = new TreeNode(15);
-            root.right.right = new TreeNode(7);
+            root.left.right = new TreeNode(5);
+            root.right.right = new TreeNode(4);
 
-            var bst = new Binary_Tree_Zigzag_Level_Order_Traversal();
+            /*
+            root.left.right.left = new TreeNode(5);
+            root.left.right.left.left = new TreeNode(4);
+            root.left.right.right = new TreeNode(7);
+            root.right.right.left = new TreeNode(13);*/
 
-            var a = bst.ZigzagLevelOrder(root);
+            var nT = new TreeNode(1);
+            nT.left = new TreeNode(11);
+            nT.right = new TreeNode(3);
+            nT.left.left = new TreeNode(41);
+            nT.left.right = new TreeNode(2);
+            nT.left.right.left = new TreeNode(7);
+            nT.left.right.right = new TreeNode(4);
+
+            var scls = new MediumBSTProblems();
+
+            var a = scls.LcaDeepestLeaves(nT);
             
             //DesignProblemsCalling(new string[0], new int[0]);
         }

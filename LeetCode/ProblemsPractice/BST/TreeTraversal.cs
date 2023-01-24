@@ -123,7 +123,7 @@ namespace ProblemsPractice.BST
                 {
                     TreeNode curNode = queue.Dequeue();
                     subList.Add(curNode.val);
-                    
+
                     if (curNode.left != null)
                         queue.Enqueue(curNode.left);
                     if (curNode.right != null)
@@ -155,7 +155,7 @@ namespace ProblemsPractice.BST
             InorderList(root.right);
         }
 
-        
+
         // 144
         public IList<int> PreorderTraversal(TreeNode root)
         {
@@ -186,7 +186,7 @@ namespace ProblemsPractice.BST
             if (root == null)
                 return;
 
-            
+
             PostorderTraversalList(root.left);
 
             PostorderTraversalList(root.right);
