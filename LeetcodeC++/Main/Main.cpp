@@ -6,39 +6,82 @@
 
 //#include "SortingAlgorithms.h"
 
+TreeNode* buildManualTree() {
+    TreeNode* tree = new TreeNode(1);
+    tree->left = new TreeNode(2);
+    tree->right = new TreeNode(3);
 
+    //tree->left->left = new TreeNode(4);
+    //tree->left->right = new TreeNode(5);
+
+    //tree->right->left = new TreeNode(6);
+    //tree->right->right = new TreeNode(7);
+
+    //tree->right->left->left = new TreeNode(119);
+    //tree->right->left->right = new TreeNode(135);
+
+    return tree;
+}
+
+ListNode* buildListNode(vector<int> vec) {
+    ListNode* head = new ListNode(vec[0]);
+    ListNode* node = head;
+
+    for (int i = 1; i < vec.size(); i++) {
+        node->next = new ListNode(vec[i]);
+        node = node->next;
+    }
+
+    return head;
+}
 
 int main()
 {
     std::cout << "Hello World!\n";
-    //vector<int> vect{ 35,43,23,86,23,45,84,2,18,83,79,28,54,81,12,94,14,0,0,29,94,12,13,1,48,85,22,95,24,5,73,10,96,97,72,41,52,1,91,3,20,22,41,98,70,20,52,48,91,84,16,30,27,35,69,33,67,18,4,53,86,78,26,83,13,96,29,15,34,80,16,49 };
-    vector<int> vect1{ 4,5,2,1 };
+    vector<int> vect1{ 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10 };
     vector<char> chvect{ 'A','A','A','B','B','B', 'C','C','C', 'D', 'D', 'E' };
     //int a = Solution::maximumTop(vect, 5);
 
     // Binary Tree Generate
     //struct TreeNode* root = new TreeNode(5);
 
-    vector<int> vect2 = { 21 };
-    vector<string> vs = { "06:20","06:28" };
+    vector<int> vect2 = { 1,2,3,4,5,6 };
+    vector<string> vs = { "aba","leetcode" , "ee", "a", "abba"};
     vector<string> vs1 = { "04:01","06:44" };
+
+    vector<vector<int>> vect2d{
+        {1, 2},
+        {3},
+        {3},
+        {}
+    };
+
+    vector<vector<int>> vect2dT{
+        {2}
+    };
+
+    unordered_map<int, vector<int>> graph{
+      { 0, {8, 1, 5} },
+      { 1, {0} },
+      { 5, {0, 8} },
+      { 8, {0, 5} },
+      { 2, {3, 4} },
+      { 3, {2, 4} },
+      { 4, {3, 2} }
+    };
+
     //Solution *sln = new Solution;
     //int ab = *sln.findTilt(root);
-    TreeNode* tree = new TreeNode(1);
-    tree->left = new TreeNode(2);
-    tree->right = new TreeNode(3);
+    
+    TreeNode* c = buildManualTree();
 
-    tree->left->left = new TreeNode(4);
-    tree->left->right = new TreeNode(5);
+    ListNode* al = buildListNode({1,2,3,4});
+    ListNode* bl = buildListNode({2,4,6});
+    ListNode* cl = buildListNode({2,6});
 
-    tree->right->left = new TreeNode(6);
-    tree->right->right = new TreeNode(7);
+    vector<ListNode*> vln = { al, bl, cl };
 
-    //tree->right->left->left = new TreeNode(119);
-    //tree->right->left->right = new TreeNode(135);
-
-    //TreeNode* c = buildTree(vect, vec);   
-    auto res = answerQueries(vect1, vect2);
+    auto res = distance(vect1);
 
     //cout << b << endl;
 }

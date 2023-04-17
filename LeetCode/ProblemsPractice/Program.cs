@@ -16,6 +16,8 @@ using System.Reflection;
 using ProblemsPractice.BST;
 using ProblemsPractice.Recursion;
 using ProblemsPractice.Sorting;
+using ProblemsPractice.Design;
+using System.Collections.Generic;
 
 namespace ProblemsPractice
 {
@@ -99,18 +101,24 @@ namespace ProblemsPractice
             root.left.right.left.left = new TreeNode(4);
             root.left.right.right = new TreeNode(7);
             root.right.right.left = new TreeNode(13);*/
-
+            /*
             var nT = new TreeNode(1);
             nT.left = new TreeNode(11);
             nT.right = new TreeNode(3);
             nT.left.left = new TreeNode(41);
             nT.left.right = new TreeNode(2);
             nT.left.right.left = new TreeNode(7);
-            nT.left.right.right = new TreeNode(4);
+            nT.left.right.right = new TreeNode(4);*/
+            IList<(int, int)> sortedList = new List<(int, int)> ();
+            sortedList.Add((10, 20));
+            sortedList.Add((22, 30));
+            sortedList.Add((30, 32));
+            MyCalendar mc = new MyCalendar(sortedList);
+            var ans = mc.Book(5, 10);
 
-            var scls = new MediumBSTProblems();
+            //var scls = new MediumBSTProblems();
 
-            var a = scls.LcaDeepestLeaves(nT);
+            //var a = scls.LcaDeepestLeaves(nT);
             
             //DesignProblemsCalling(new string[0], new int[0]);
         }

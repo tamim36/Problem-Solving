@@ -2,6 +2,12 @@
 #ifndef SOLUTION_H
 #define SOLUTION_H
 
+struct ListNode {
+    int val;
+    ListNode* next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
 struct TreeNode {
     int val;
     TreeNode* left;
@@ -10,6 +16,2099 @@ struct TreeNode {
     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
     TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
 };
+
+
+// Weekly Contest 341
+int maxDivScore(vector<int>& nums, vector<int>& divisors) {
+    unordered_map<int, int> divisorScores;
+    unordered_map<int, int> vis;
+
+    for (int i = 0; i < divisors.size(); i++) {
+        if (!divisors[i]) {
+            for (int j = 0; j < nums.size(); j++) {
+                if (nums[j] % divisors[i] == 0) {
+                    divisorScores[divisors[i]]++;
+                }
+            }
+        }
+        vis[divisors[i]] = 1;
+    }
+
+    int maxScore = 0;
+    int result = divisors[0];
+
+    for (int i = 0; i < divisors.size(); i++) {
+        if (divisorScores[divisors[i]] >= maxScore) {
+            if (divisorScores[divisors[i]] > maxScore) {
+                maxScore = divisorScores[divisors[i]];
+                result = divisors[i];
+            }
+            else if (divisors[i] < result)
+                result = divisors[i];
+        }
+    }
+
+    return result;
+}
+
+int addMinimum(string word) {
+    int cnt = 0;
+    int sz = word.size();
+
+    for (int i = 0; i < sz; i++) {
+        // a ab ac abc
+        if (word[i] == 'a') {
+            // ab 
+            if (i + 1 < sz && word[i + 1] == 'b') {
+                // abc
+                if (i + 2 < sz && word[i + 2] == 'c') {
+                    i = i + 2;
+                }
+                else {
+                    cnt++;
+                    i++;
+                }
+            }
+            // ac
+            else if (i + 1 < sz && word[i + 1] == 'c') {
+                cnt++;
+                i++;
+            }
+            // aa
+            else {
+                cnt += 2;
+            }
+        }
+
+        // b ba bc 
+        else if (word[i] == 'b') {
+            if (i + 1 < sz && word[i + 1] == 'c') {
+                i++;
+                cnt++;
+            }
+            else {
+                cnt += 2;
+            }
+        }
+
+        // c
+        else if (word[i] == 'c') {
+            cnt += 2;
+        }
+    }
+
+    return cnt;
+}
+
+vector<int> rowAndMaximumOnes(vector<vector<int>>& mat) {
+    int ones = 0, row = 0, cnt = 0;
+
+    for (int i = 0; i < mat.size(); i++) {
+        cnt = 0;
+        for (int j = 0; j < mat[0].size(); j++) {
+            if (mat[i][j]) cnt++;
+        }
+        if (cnt > ones) {
+            ones = cnt;
+            row = i;
+        }
+    }
+
+    return { ones, row };
+}
+
+// biweekly contest 102
+TreeNode* replaceValueInTree(TreeNode* root) {
+    queue<TreeNode*> q;
+    root->val = 0;
+    q.push(root);
+
+
+    while (!q.empty()) {
+        int sz = q.size();
+        if (sz == 1) {
+            TreeNode* node = q.front(); q.pop();
+            if (node->left) {
+                node->left->val = 0;
+                q.push(node->left);
+            }
+
+            if (node->right) {
+                node->right->val = 0;
+                q.push(node->right);
+            }
+        }
+        else {
+            int sum = 0;
+            for (int i = 0; i < sz; i++) {
+                TreeNode* node = q.front(); q.pop();
+                sum += node->left ? node->left->val : 0;
+                sum += node->right ? node->right->val : 0;
+                q.push(node);
+            }
+            for (int i = 0; i < sz; i++) {
+                TreeNode* node = q.front(); q.pop();
+                int cur = 0;
+                cur += node->left ? node->left->val : 0;
+                cur += node->right ? node->right->val : 0;
+                cur = sum - cur;
+                if (node->left) {
+                    node->left->val = cur;
+                    q.push(node->left);
+                }
+
+                if (node->right) {
+                    node->right->val = cur;
+                    q.push(node->right);
+                }
+            }
+        }
+    }
+
+    return root;
+}
+
+vector<long long> findPrefixScore(vector<int>& nums) {
+    int sz = nums.size();
+    vector<long long> ans(sz, 0);
+    long long mx = 0;
+
+    for (int i = 0; i < sz; i++) {
+        mx = max(mx, (nums[i] * 1ll));
+        long long pre = i > 0 ? ans[i - 1] : 0;
+        ans[i] = pre + (nums[i] * 1ll) + mx;
+    }
+
+    return ans;
+}
+
+vector<int> findColumnWidth(vector<vector<int>>& grid) {
+    vector<int> ans;
+
+    for (int i = 0; i < grid[i].size(); i++) {
+        int mx = 0;
+        for (int j = 0; j < grid.size(); j++) {
+            string val =  to_string(grid[j][i]);
+            int sz = val.size();
+            mx = max(mx, sz);
+        }
+        ans.push_back(mx);
+    }
+
+    return ans;
+}
+
+// 547
+int findCircleNum(vector<vector<int>>& isConnected) {
+    return 0;
+}
+
+// 684
+// template union find
+int findParent(vector<int>& parent, int x) {
+    return parent[x] == x ? x : findParent(parent, parent[x]);
+}
+
+vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+    int n = edges.size();
+    vector<int> parent(n + 1, 0);
+
+    for (int i = 0; i <= n; i++)
+        parent[i] = i;
+
+    vector<int> res(2, 0);
+    for (int i = 0; i < n; i++) {
+        int x = findParent(parent, edges[i][0]);
+        int y = findParent(parent, edges[i][1]);
+
+        if (x != y)
+            parent[y] = x;
+        else {
+            res[0] = x;
+            res[1] = y;
+        }
+    }
+
+    return res;
+}
+
+// 841
+bool canVisitAllRooms(vector<vector<int>>& rooms) {
+    int roomNo = rooms.size()-1;
+    unordered_set<int> vis;
+    vector<int> keys(rooms[0]);
+    vis.insert(0);
+
+    while (!keys.empty())
+    {
+        int key = keys.back(); keys.pop_back();
+
+        if (!vis.count(key)) {
+            for (int k : rooms[key]) {
+                if (!vis.count(k))
+                    keys.push_back(k);
+            }
+
+            vis.insert(key);
+            roomNo--;
+        }
+    }
+
+    if (!roomNo) return true;
+    return false;
+}
+
+// 2616
+bool isValidMinimizeMax(vector<int>& nums, int p, int x) {
+    for (int i = 0; p > 0 && i < nums.size()-1; i++) {
+        if ((nums[i + 1] - nums[i]) <= x) {
+            p--;
+            i++;
+        }
+    }
+    if (p <= 0)
+        return true;
+    else
+        return false;
+}
+
+int minimizeMax(vector<int>& nums, int p) {
+    if (!p || nums.empty())
+        return 0;
+
+    sort(nums.begin(), nums.end());
+
+    int sz = nums.size(), left = 0, right = (nums[sz-1] - nums[0] + 1);
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (isValidMinimizeMax(nums, p, mid))
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left;
+}
+
+// 1557
+vector<int> findSmallestSetOfVertices(int n, vector<vector<int>>& edges) {
+    unordered_set<int> sources;
+    vector<int> vis(n, 0);
+    for (auto& edge : edges) {
+        int src = edge[0], des = edge[1];
+        if (!vis[src])
+            sources.insert(src);
+        if (sources.count(des))
+            sources.erase(sources.find(des));
+        vis[src] = 1;
+        vis[des] = 1;
+    }
+
+    vector<int> ans;
+    for (auto& s : sources)
+        ans.push_back(s);
+
+    return ans;
+}
+
+long long getDistanceVal(vector<long long>& prefixSum, int i, unordered_map<int, int>& index_map) {
+    if (prefixSum.size() == 1)
+        return prefixSum[0];
+
+    int prefixInd = index_map[i] + 1;
+    long long preVal = 0;
+    if (prefixInd)
+        preVal = (i * prefixInd * 1ll) - prefixSum[prefixInd-1];
+
+    int rem_sz = prefixSum.size() - prefixInd;
+    long long postVal = prefixSum[prefixSum.size()-1] - prefixSum[prefixInd-1] - (i * rem_sz * 1ll);
+
+    return preVal + postVal;
+}
+
+vector<long long> distance(vector<int>& nums) {
+    // prefix-sum
+    unordered_map<int, vector<long long>> mp;
+    unordered_map<int, int> in_pre;
+
+    for (int i = 0; i < nums.size(); i++) {
+        int sz = mp[nums[i]].size();
+        long long val = 0; 
+        if (!mp[nums[i]].empty())
+            val = mp[nums[i]][sz - 1];
+
+        mp[nums[i]].push_back(val + i);
+        in_pre[i] = sz;
+    }
+
+    vector<long long> ansVec;
+    for (int i = 0; i < nums.size(); i++) {
+        long long val_ans = getDistanceVal(mp[nums[i]], i, in_pre);
+        ansVec.push_back(val_ans);
+    }
+
+    return ansVec;
+}
+
+bool isPrime(int n)
+{
+    if (n <= 1)
+        return false;
+
+    for (int i = 2; i * i <= n; i++) {
+        if (n % i == 0)
+            return false;
+    }
+    return true;
+}
+
+int diagonalPrime(vector<vector<int>>& nums) {
+    int mx = 0;
+    int SIZE = nums.size();
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if ((i == j || i + j == SIZE - 1) && isPrime(nums[i][j]))
+                mx = max(mx, nums[i][j]);
+        }
+    }
+
+    return mx;
+}
+
+//62
+// dp solution
+int uniquePaths(int m, int n) {
+    int dp[101][101];
+
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == 0 || j == 0)
+                dp[i][j] = 1;
+            else
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+        }
+    }
+
+
+    return dp[m-1][n-1];
+}
+
+
+// time limit exceeded
+int uniquePathstle(int m, int n) {
+    if (m == 1 || n == 1)
+        return 1;
+
+    int cnt = 0;
+    queue<pair<int, int>> q;
+    q.push({0, 0});
+
+    while (!q.empty()) {
+        auto top = q.front(); q.pop();
+        if (top.first == m - 1 && top.second == n - 1) {
+            cnt++;
+            continue;
+        }
+
+        if (top.first < m - 1)
+            q.push({ top.first + 1, top.second });
+        if (top.second < n - 1)
+            q.push({ top.first, top.second + 1 });
+    }
+
+    return cnt;
+}
+
+
+//797
+vector<vector<int>> allPathsSourceTargets(vector<vector<int>>& graph) {
+    // edges cases:
+    if (graph.empty()) {
+        return {};
+    }
+
+    // build di-graph
+    unordered_map<int, vector<int>> d;
+    for (int i = 0; i < graph.size(); i++) {
+        d[i] = graph[i]; // one-way link
+    }
+
+    // apply DFS on DAG
+    int n = graph.size();
+    vector<pair<int, vector<int>>> stack = { {0, {0}} };
+    vector<vector<int>> res;
+    while (!stack.empty()) {
+        int node = stack.back().first;
+        vector<int> path = stack.back().second;
+        stack.pop_back();
+        // check leaf
+        if (node == n - 1) {
+            res.push_back(path);
+        }
+        // traverse rest
+        for (int nei : d[node]) {
+            path.push_back(nei);
+            stack.push_back({ nei, path });
+            path.pop_back();
+        }
+    }
+    return res;
+}
+
+vector<vector<int>> allPathsSourceTarget(vector<vector<int>>& graph) {
+    vector<vector<int>> ans;
+    queue<vector<int>> q;
+    int des = graph.size()-1, src = 0;
+    q.push({0});
+
+    while (!q.empty()) {
+        auto top = q.front(); q.pop();
+        int curDes = top[top.size() - 1];
+        if (curDes == des) {
+            ans.push_back(top);
+            continue;
+        }
+        for (auto edge : graph[curDes]) {
+            top.push_back(edge);
+            q.push(top);
+            top.pop_back();
+        }
+    }
+    return ans;
+}
+
+//997
+int findJudge(int n, vector<vector<int>>& trust) {
+    vector<vector<int>> adj(n + 1);
+
+    for (auto t : trust) {
+        int s = t[0], d = t[1];
+        adj[s].push_back(d);
+    }
+
+    int judge = 0;
+    for (int i = 1; i < adj.size(); i++) {
+        if (!adj[i].size()) {
+            judge = i;
+            break;
+        }
+    }
+    if (!judge) return -1;
+    for (int i = 1; i < adj.size(); i++) {
+        if (judge == i)
+            continue;
+        if (adj[i].empty())
+            return -1;
+
+        bool hasConn = false;
+        for (int j = 0; j < adj[i].size(); j++) {
+            if (adj[i][j] == judge) {
+                hasConn = true;
+                break;
+            }
+        }
+        if (!hasConn)
+            return -1;
+    }
+
+    return judge;
+}
+
+//695
+int dfsTomaxAreaOfIsland(vector<vector<int>>& grid, vector<vector<int>>& vis, int r, int c) {
+    if (r < 0 || c < 0 || r >= grid.size() || c >= grid[0].size()) return 0;
+    if (vis[r][c] || !grid[r][c]) return 0;
+    vis[r][c] = 1;
+
+    int dx[] = { 1, -1, 0, 0 };
+    int dy[] = { 0, 0, 1, -1 };
+
+    int size = 1;
+
+    for (int i = 0; i < 4; i++)
+        size += dfsTomaxAreaOfIsland(grid, vis, r + dx[i], c + dy[i]);
+
+    return size;
+}
+
+int maxAreaOfIsland(vector<vector<int>> grid) {
+    int r = grid.size(), c = grid[0].size(), maxi = 0;
+    // 2d_vector 2dvector vect2d
+    vector<vector<int>> vis(r, vector<int>(c, 0));
+
+    for (int r = 0; r < grid.size(); r++) {
+        for (int c = 0; c < grid[0].size(); c++) {
+            if (!vis[r][c] && grid[r][c]) {
+                maxi = max(maxi, dfsTomaxAreaOfIsland(grid, vis, r, c));
+            }
+        }
+    }
+
+    return maxi;
+}
+
+int findCenter(vector<vector<int>>& edges) {
+    unordered_map<int, vector<int>> adj;
+    int n = 0;
+    for (auto edge : edges) {
+        adj[edge[0]].push_back(edge[1]);
+        adj[edge[1]].push_back(edge[0]);
+        n = max(n, edge[0]);
+        n = max(n, edge[1]);
+    }
+
+    for (auto kv : adj) {
+        if (adj[kv.first].size() == n - 1)
+            return kv.first;
+    }
+
+    return -1;
+}
+
+// weekly contest
+int miceAndCheese(vector<int>& reward1, vector<int>& reward2, int k) {
+    priority_queue<int, vector<int>, greater<int>> pq;
+    long long sum = 0;
+    for (int i = 0; i < reward1.size(); i++) {
+        pq.push(reward1[i] - reward2[i]);
+        sum += reward2[i];
+        if (pq.size() > k)
+            pq.pop();
+    }
+
+    while (!pq.empty())
+    {
+        sum += pq.top();
+        pq.pop();
+    }
+
+    return sum;
+}
+
+int miceAndCheese2(vector<int>& reward1, vector<int>& reward2, int k) {
+    vector<int> v;
+    long long sum = 0;
+    for (int i = 0; i < reward1.size(); i++) {
+        v.push_back(reward1[i] - reward2[i]);
+        sum += reward2[i];
+    }
+
+    sort(v.begin(), v.end(), greater<int>());
+
+    for (int i = 0; i < k; i++)
+        sum += v[i];
+
+    return sum;
+}
+
+vector<vector<int>> findMatrix(vector<int>& nums) {
+    unordered_map<int, int> m;
+    vector<vector<int>> ans;
+
+    for (auto num : nums) m[num]++;
+
+    while (!m.empty()) {
+        vector<int> v;
+        for (auto it = m.cbegin(); it != m.cend();)
+        {
+            v.push_back(it->first);
+            m[it->first]--;
+            if (it->second == 0)
+            {
+                m.erase(it++);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+        ans.push_back(v);
+    }
+
+    return ans;
+}
+
+int findTheLongestBalancedSubstring(string s) {
+    int zero = 0, ones = 0, mx = 0;
+
+    for (auto c : s) {
+        if (c == '0') {
+            if (ones > 0) zero = 0;
+            zero++;
+            ones = 0;
+        }
+        else if (c == '1') {
+            ones++;
+        }
+        
+        if (zero >= ones)
+            mx = max(mx, ones * 2);
+    }
+    return mx;
+}
+
+
+unordered_set<int> vis;
+vector<vector<int>> adjacencyList(int n, vector<vector<int>>& edges) {
+    vector<vector<int>> adj(n);
+    for (auto edge : edges) {
+        int a = edge[0], b = edge[1];
+
+        adj[a].push_back(b);
+        adj[b].push_back(a);
+    }
+    return adj;
+}
+
+bool is_has_validPath(vector<vector<int>> adj, int src, int dst) {
+    if (src == dst) return true;
+    if (vis.count(src)) return false;
+
+    vis.insert(src);
+
+    for (auto node : adj[src])
+        if (is_has_validPath(adj, node, dst))
+            return true;
+
+    return false;
+}
+
+bool validPath(int n, vector<vector<int>>& edges, int source, int destination) {
+    auto adj = adjacencyList(n, edges);
+    return is_has_validPath(adj, source, destination);
+}
+
+// Graph Algorithms
+// https://structy.net/problems/minimum-island
+int dfsTominimumIsland(vector<vector<char>>& grid, vector<vector<int>>& vis, int r, int c) {
+    if (r < 0 || c < 0 || r >= grid.size() || c >= grid[0].size()) return 0;
+    if (vis[r][c] || grid[r][c] != 'L') return 0;
+    vis[r][c] = 1;
+
+    int dx[] = { 1, -1, 0, 0 };
+    int dy[] = { 0, 0, 1, -1 };
+
+    int size = 1;
+
+    for (int i = 0; i < 4; i++)
+        size += dfsTominimumIsland(grid, vis, r + dx[i], c + dy[i]);
+
+    return size;
+}
+
+int minimumIsland(vector<vector<char>> grid) {
+    int r = grid.size(), c = grid[0].size(), mini = INT_MAX;
+    vector<vector<int>> vis(r, vector<int>(c, 0));
+
+    for (int r = 0; r < grid.size(); r++) {
+        for (int c = 0; c < grid[0].size(); c++) {
+            if (!vis[r][c] && grid[r][c] == 'L') {
+                int len = dfsTominimumIsland(grid, vis, r, c);
+                if (len != 0)
+                    mini = min(mini, len);
+            }
+        }
+    }
+
+    return mini;
+}
+
+// https://structy.net/problems/island-count
+void dfsToMarkLand(vector<vector<char>>& grid, vector<vector<int>>& vis, int r, int c) {
+    if (r < 0 || c < 0 || r >= grid.size() || c >= grid[0].size()) return;
+    if (vis[r][c] || grid[r][c] != 'L') return;
+    vis[r][c] = 1;
+
+    int dx[] = { 1, -1, 0, 0 };
+    int dy[] = { 0, 0, 1, -1 };
+
+    for (int i = 0; i < 4; i++) 
+        dfsToMarkLand(grid, vis, r+dx[i], c+dy[i]);
+}
+
+int islandCount(vector<vector<char>> grid) {
+    int r = grid.size(), c = grid[0].size(), cnt = 0;
+    vector<vector<int>> vis(r, vector<int>(c, 0));
+
+    for (int r = 0; r < grid.size(); r++) {
+        for (int c = 0; c < grid[0].size(); c++) {
+            if (!vis[r][c] && grid[r][c] == 'L') {
+                dfsToMarkLand(grid, vis, r, c);
+                cnt++;
+            }
+        }
+    }
+
+    return cnt;
+}
+
+// Shortest Path BFS
+int shortestPath(vector<tuple<string, string>> edges, string nodeA, string nodeB) {
+    if (nodeA == nodeB) return 0;
+    unordered_map<string, vector<string>> adj;
+
+    for (auto edge : edges) {
+        string a = get<0>(edge), b = get<1>(edge);
+        adj[a].push_back(b);
+        adj[b].push_back(a);
+    }
+
+    queue<pair<string, int>> q;
+    unordered_set<string> vis;
+    q.push({nodeA, 0});
+    vis.insert(nodeA);
+
+    while (!q.empty()) {
+        auto top = q.front(); q.pop();
+        string curNode = top.first; int dis = top.second;
+
+        for (auto neighbor : adj[curNode]) {
+            if (vis.count(neighbor))
+                continue;
+
+            if (neighbor == nodeB)
+                return dis + 1;
+
+            q.push({neighbor, dis+1});
+            vis.insert(neighbor);
+        }
+    }
+
+    return 0;
+}
+
+// largest component
+// https://structy.net/problems/largest-component
+int dfs_largestComponent(unordered_map<int, vector<int>>& graph, unordered_set<int>& vis, int src) {
+    if (vis.count(src))
+        return 0;
+
+    vis.insert(src);
+    int size = 1;
+    for (auto node : graph[src])
+        size += dfs_largestComponent(graph, vis, node);
+
+    return size;
+}
+
+int largestComponent(unordered_map<int, vector<int>> graph) {
+    unordered_set<int> vis;
+
+    int mx = 0;
+    for (auto kv : graph) {
+        if (!vis.count(kv.first)) {
+            mx = max(mx, dfs_largestComponent(graph, vis, kv.first));
+        }
+    }
+
+    return mx;
+}
+
+// connected component
+// https://structy.net/problems/connected-components-count
+
+int dfs_connectedComponentsCount(unordered_map<int, vector<int>>& graph, unordered_set<int>& vis, int src) {
+    if (vis.count(src))
+        return 0;
+
+    vis.insert(src);
+    for (auto node : graph[src])
+        dfs_connectedComponentsCount(graph, vis, node);
+
+    return 1;
+}
+
+int connectedComponentsCount(unordered_map<int, vector<int>> graph) {
+    unordered_set<int> vis;
+
+    int count = 0;
+    for (auto kv : graph) {
+        if (!vis.count(kv.first)) {
+            count += dfs_connectedComponentsCount(graph, vis, kv.first);
+        }
+    }
+
+    return count;
+}
+
+// undirected graph
+// https://structy.net/problems/undirected-path
+unordered_set<string> is_path_vis;
+bool is_path_undirectedtPath(unordered_map<string, vector<string>> adj, string src, string dst) {
+    if (src == dst) return true;
+
+    is_path_vis.insert(src);
+
+    for (auto v : adj[src]) {
+        if (!is_path_vis.count(v) && is_path_undirectedtPath(adj, v, dst))
+            return true;
+    }
+
+    return false;
+}
+
+bool undirectedPath(vector<tuple<string, string>> edges, string src, string dst) {
+    unordered_map<string, vector<string>> adj;
+
+    for (auto edge : edges) {
+        adj[get<0>(edge)].push_back(get<1>(edge));
+        adj[get<1>(edge)].push_back(get<0>(edge));
+    }
+
+    return is_path_undirectedtPath(adj, src, dst);
+}
+
+// directed graph
+bool has_path(vector<vector<int>> graph, int src, int des) {
+    if (src == des) return true;
+
+    for (auto node : graph[src]) {
+        if (has_path(graph, node, des))
+            return true;
+    }
+
+    return false;
+}
+
+bool bfs_graph(vector<vector<int>> graph, int source) {
+    queue<int> q;
+    q.push(source);
+
+    while (!q.empty()) {
+        int curNode = q.front(); q.pop();
+        cout << curNode << endl;
+
+        for (int node : graph[curNode])
+            q.push(node);
+    }
+
+
+    return true;
+}
+
+void dfs_graph_recursion_helper(vector<vector<int>> graph, int source) {
+    cout << source << endl;
+
+    for (int node : graph[source])
+        dfs_graph_recursion_helper(graph, node);
+}
+
+bool dfs_graph_recursion(vector<vector<int>> graph, int source) {
+    dfs_graph_recursion_helper(graph, source);
+
+    return true;
+}
+
+bool dfs_graph(vector<vector<int>> graph, int source) {
+    stack<int> stk;
+    stk.push(source);
+
+    while (!stk.empty()) {
+        int curNode = stk.top(); stk.pop();
+        cout << curNode << endl;
+
+        for (int node : graph[curNode])
+            stk.push(node);
+    }
+    return true;
+}
+
+// 206 
+ListNode* reverse_recursion(ListNode* head, ListNode* newHead) {
+    if (!head)
+        return newHead;
+    ListNode* next = head->next;
+    head->next = newHead;
+    return reverse_recursion(next, head);
+}
+
+ListNode* reverseList_Recursion(ListNode* head) {
+    return reverse_recursion(head, NULL);
+}
+
+// 206
+ListNode* reverseList(ListNode* head) {
+    if (!head || !head->next)
+        return head;
+    ListNode* cur = head;
+    ListNode* rev = head;
+    ListNode* temp = head;
+    cur = cur->next;
+    temp->next = NULL;
+    
+    while (cur)
+    {
+        rev = cur;
+        cur = cur->next;
+        rev->next = temp;
+        temp = rev;
+    }
+
+    return rev;
+}
+
+// 2130
+int pairSum(ListNode* head) {
+    if (!head) return 0;
+
+    ListNode* slow = head;
+    ListNode* fast = head;
+    ListNode* temp = NULL;
+    ListNode* revHead = NULL;
+    int sum = 0;
+
+    while (fast->next) {
+        fast = fast->next->next;
+
+        temp = slow->next;
+        slow->next = revHead;
+        revHead = slow;
+        slow = temp;
+    }
+
+    while (slow->next) {
+        sum = max(sum, slow->val + revHead->val);
+        slow = slow->next;
+        revHead = revHead->next;
+    }
+
+    return sum;
+}
+
+// 535
+class Encode_and_Decode_TinyURL{
+public:
+    unordered_map<string, string> long_short, short_long;
+    long long val = 0;
+    string tinyUrl = "http://tinyurl.com/";
+    // Encodes a URL to a shortened URL.
+    string encode(string longUrl) {
+        if (!long_short.count(longUrl)) {
+            string short_url = tinyUrl + to_string(val++);
+            long_short[longUrl] = short_url;
+            short_long[short_url] = longUrl;
+        }
+          
+        return long_short[longUrl];
+    }
+
+    // Decodes a shortened URL to its original URL.
+    string decode(string shortUrl) {
+        return short_long[shortUrl];
+    }
+};
+
+// 1315
+int sumEvenGrandparent(TreeNode* root) {
+    queue<TreeNode*> q;
+    q.push(root);
+    int sum = 0;
+
+    while (!q.empty())
+    {
+        TreeNode* cur = q.front(); q.pop();
+        if (!(cur->val % 2)) {
+            sum += cur->left ? cur->left->left ? cur->left->left->val : 0 : 0;
+            sum += cur->left ? cur->left->right ? cur->left->right->val : 0 : 0;
+            sum += cur->right ? cur->right->left ? cur->right->left->val : 0 : 0;
+            sum += cur->right ? cur->right->right ? cur->right->right->val : 0 : 0;
+        }
+
+        if (cur->left) q.push(cur->left);
+        if (cur->right) q.push(cur->right);
+    }
+    return sum;
+}
+
+int findIndex(vector<int>& nums, int val) {
+    int left = 0, right = nums.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (nums[mid] >= val)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left - 1;
+}
+
+vector<long long> minOperations(vector<int>& nums, vector<int>& q) {
+    sort(nums.begin(), nums.end());
+    int sz = nums.size();
+    vector<long long> pfx(sz);
+    pfx[0] = nums[0];
+
+    for (int i = 1; i < sz; i++) {
+        pfx[i] = pfx[i - 1] + nums[i];
+    }
+
+    vector<long long> ans(sz);
+    long long val = 0;
+    for (int i = 0; i < q.size(); i++) {
+        int idx = findIndex(nums, q[i]);
+        if (idx >= 0) {
+            val = ((idx + 1) * q[i]) - pfx[idx];
+            val += ((pfx[sz - 1] - pfx[idx]) - ((sz - idx - 1)* 1ll * q[i]));
+        }
+        else {
+            val = pfx[sz - 1] - (sz * q[i]);
+        }
+        
+        ans.push_back(val);
+    }
+
+    return ans;
+}
+
+int kItemsWithMaximumSum(int numOnes, int numZeros, int numNegOnes, int k) {
+    int sum = 0;
+
+    sum += min(numOnes, k);
+    k -= numOnes;
+
+    if (k > 0 && numZeros > 0) k -= numZeros;
+
+    if (k > 0) sum -= (k * 1);
+
+    return sum;
+}
+
+// 1302
+int deepestLeavesSum(TreeNode* root) {
+    queue<TreeNode*> q;
+    q.push(root);
+    int sum = 0, sz = 0;
+
+    while (!q.empty())
+    {
+        sz = q.size();
+        sum = 0;
+
+        for (int i = 0; i < sz; i++) {
+            TreeNode* cur = q.front(); q.pop();
+            sum += cur->val;
+
+            if (cur->left) q.push(cur->left);
+            if (cur->right) q.push(cur->right);
+        }
+    }
+
+    return sum;
+}
+
+
+// 2149
+vector<int> rearrangeArray(vector<int>& nums) {
+    vector<int> v(nums.size());
+
+    for (int i = 0, ev = 0, od = 1; i < nums.size(); i++) {
+        if (nums[i] >= 0) {
+            v[ev] = nums[i];
+            ev += 2;
+        }
+        else {
+            v[od] = nums[i];
+            od += 2;
+        }
+    }
+    return v;
+}
+
+int findSmallestInteger(vector<int>& nums, int value) {
+    set<int> s;
+    long long mx = INT_MIN, mn = INT_MAX;
+    unordered_map<int, long long> mp;
+
+    for (auto num : nums) {
+        long long posv = 0;
+        if (num >= 0) posv = num % value;
+        else {
+            num %= value;
+            //cout << num << endl;
+            if (num < 0) { num += value; posv = num; }
+        }
+
+        if (s.count(posv) && value == 1) posv = mx + 1;
+
+        int key = posv;
+        if (s.count(posv)) posv = mp[posv] + value;
+        while (s.count(posv))
+        {
+            posv += value;
+        }
+        mx = max(mx, posv);
+        mn = min(mn, posv);
+        //cout << "in  " << posv << endl;
+        mp[key] = posv;
+        s.insert(posv);
+    }
+
+    int prev = -1, cnt = 0;
+    for (auto num : s) {
+        if (++prev != num) return prev;
+        cnt = num;
+    }
+    return ++cnt;
+}
+
+vector<int> evenOddBit(int n) {
+    int binaryNum[32];
+
+    int i = 0;
+    while (n > 0) {
+        binaryNum[i] = n % 2;
+        n = n / 2;
+        i++;
+    }
+
+    int odd = 0, even = 0;
+    for (int j = i - 1; j >= 0; j--)
+    {
+        if (binaryNum[j]) {
+            if (j % 2) even++;
+            else odd++;
+        }    
+    }
+
+    vector<int> ans = {even, odd};
+    return ans;
+}
+
+// bi weekly 100
+long long findScore(vector<int>& nums) {
+    long long ans = 0;
+    vector<pair<int, int>> valueIndex;
+    unordered_set<int> indx;
+
+    for (int i = 0; i < nums.size(); i++)
+        valueIndex.push_back({nums[i], i});
+
+    sort(valueIndex.begin(), valueIndex.end(), [](pair<int, int> p1, pair<int, int> p2) {
+        if (p1.first == p2.first) return p1.second < p2.second;
+        else return p1.first < p2.first;
+        });
+
+    for (auto p : valueIndex) {
+        if (!indx.count(p.second)) {
+            ans += p.first;
+            indx.insert(p.second);
+            if (p.second > 0) indx.insert(p.second - 1);
+            if (p.second < nums.size() - 1) indx.insert(p.second + 1);
+        }
+    }
+
+    return ans;
+}
+
+int maximizeGreatness(vector<int>& nums) {
+    return 0;
+}
+
+int distMoney(int money, int children) {
+    money -= children;
+    if (money < 0) return -1;
+
+    int v = children;
+    int ans = 0;
+    while (money >= 7 && v--)
+    {
+        money -= 7;
+        ans++;
+    }
+    if (money > 0 && v == 0) ans--;
+    if (money == 3 && v == 1) ans--;
+    if (ans <= 0) return 0;
+    return ans;
+}
+
+int minV = INT_MAX;
+bool isValidMaxValue(vector<vector<int>>& mat, int mid, int t) {
+    if (mid == 1)
+        if (minV <= t) 
+            return true;
+        else
+            return false;
+
+    for (int row = mid-1.; row < mat.size(); row++) {
+        for (int col = mid-1; col < mat[0].size(); col++) {
+            /*int a = mat[row][col];
+            int b = (row - mid) >= 0 ? mat[row - mid][col] : 0;
+            int c = (col - mid) >= 0 ? mat[row][col - mid] : 0;
+            int d = (row - mid) >= 0 && (col - mid) >= 0 ? mat[row - mid][col - mid] : 0;
+            int val = a - b - c + d;*/
+            int val = mat[row][col]
+                - ((row - mid) >= 0 ? mat[row - mid][col] : 0) 
+                - ((col - mid) >= 0 ? mat[row][col - mid] : 0)
+                + ((row - mid) >= 0 && (col - mid) >= 0 ? mat[row - mid][col - mid] : 0);
+
+            if (val <= t) return true;
+        }
+    }
+
+    return false;
+}
+
+// 1292
+int maxSideLength(vector<vector<int>>& mat, int threshold) {
+    // 2d prefix sum
+    
+    for (int row = 0; row < mat.size(); row++) {
+        for (int col = 0; col < mat[row].size(); col++) {
+            minV = min(minV, mat[row][col]);
+            mat[row][col] += (row > 0 ? mat[row - 1][col] : 0) 
+                + (col > 0 ? mat[row][col - 1] : 0)
+                - (row > 0 && col > 0 ? mat[row - 1][col - 1] : 0);
+        }
+    }
+
+    int left = 0, right = min(mat.size(), mat[0].size()) + 1;
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (isValidMaxValue(mat, mid, threshold))
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+
+    return left - 1;
+}
+
+// 2589
+int findMinimumTime(vector<vector<int>>& tasks) {
+    sort(tasks.begin(), tasks.end(), [](const auto& t1, const auto& t2) {
+        return t1[1] < t2[2];
+        });
+
+    vector<int> v(2001);
+    int cnt = 0;
+
+    for (auto task : tasks) {
+        int st = task[0], end = task[1], d = task[2];
+
+        for (int i = st; i <= end; i++) {
+            if (v[i]) d--;
+            else if (i+d-1 == end) {
+                v[i] = 1;
+                cnt++;
+                d--;
+            }
+        }
+    }
+
+    return cnt;
+}
+
+// weekly contest
+
+int maxScore(vector<int>& nums) {
+    sort(nums.begin(), nums.end(), greater<int>());
+
+    unsigned long long pfx = 0;
+
+    for (int i = 0; i < nums.size(); i++) {
+        pfx += nums[i];
+        if (pfx <= 0) return i;
+    }
+
+    return nums.size();
+}
+
+int vowelStrings(vector<string>& words, int left, int right) {
+    int cnt = 0;
+    unordered_set<char> st{'a', 'e', 'i', 'o', 'u'};
+    for (int i = left; i <= right; i++) {
+        string word = words[i];
+        if (st.count(word[0]) && st.count(word[word.size() - 1]))
+            cnt++;
+    }
+    return cnt;
+}
+
+// 2424. Longest Uploaded Prefix
+class LUPrefix {
+    unordered_set<int> st;
+    int cur = 0;
+public:
+    LUPrefix(int n) {
+
+    }
+
+    void upload(int video) {
+        st.insert(video);
+
+        while (st.find(cur + 1) != st.end())
+            st.erase(++cur);
+    }
+
+    int longest() {
+        return cur;
+    }
+};
+
+
+long long gcd(long long a, long long b)
+{
+    if (a == 0)
+        return b;
+    if (b == 0)
+        return a;
+
+    if (a == b)
+        return a;
+
+    if (a > b)
+        return gcd(a - b, b);
+    return gcd(a, b - a);
+}
+
+int findValidSplit(vector<int>& nums) {
+    long long suff = 1;
+    for (int i = 1; i < nums.size(); i++) {
+        suff *= nums[i];
+    }
+    long long pref = nums[0];
+    for (int i = 1; i < nums.size(); i++) {
+        long long gcdv = gcd(pref, suff);
+        if (gcdv == 1) return i-1;
+        else {
+            pref *= nums[i];
+            suff /= nums[i];
+        }
+    }
+
+    return -1;
+}
+
+long long kthLargestLevelSum(TreeNode* root, int k) {
+    if (root == NULL) return -1;
+    queue<TreeNode*> q;
+    priority_queue<long long, vector<long long>, greater<long long>> pq;
+    q.push(root);
+    pq.push(root->val);
+
+    while (!q.empty()) {
+        int sz = q.size();
+        long long lvlS = 0;
+        
+        for (int i = 0; i < sz; i++) {
+            TreeNode* node = q.front(); q.pop();
+            if (node->left) {
+                q.push(node->left);
+                lvlS += node->left->val;
+            }
+            if (node->right) {
+                q.push(node->right);
+                lvlS += node->right->val;
+            }
+        }
+        pq.push(lvlS);
+        if (pq.size() > k) pq.pop();
+    }
+    return pq.top() == 0 ? -1 : pq.top();
+}
+
+int passThePillow(int n, int time) {
+    int rem = time % (n - 1);
+    int rnd = time / (n - 1);
+
+    if (rnd % 2)
+        return 1 + (n - 1 - rem);
+    else
+        return 1 + rem;
+}
+
+// ByWeekly Contest 99
+
+long ColoredCells(int n) {
+    return (long)(n - 1) * 2 * n + 1;
+}
+
+int splitNum(int num) {
+    vector<int> v;
+
+    while (num > 0) {
+        v.push_back(num % 10);
+        num /= 10;
+    }
+    sort(v.begin(), v.end());
+
+    int num1 = 0, num2 = 0;
+    for (int i = 0; i < v.size(); i++) {
+        if (i % 2) {
+            num1 = (num1 * 10) + v[i];
+        }
+        else {
+            num2 = (num2 * 10) + v[i];
+        }
+    }
+    return num1 + num2;
+}
+
+int testcode() {
+    string num1 = "123456789012345678901234567890";
+    string num2 = "1234567890";
+
+    /*boost::multiprecision::cpp_int n1(num1);
+    boost::multiprecision::cpp_int n2(num2);
+
+    boost::multiprecision::cpp_int rem = n1 % n2;
+
+    if (rem == 0) {
+        std::cout << num1 << " is divisible by " << num2 << std::endl;
+    }
+    else {
+        std::cout << num1 << " is not divisible by " << num2 << std::endl;
+    }*/
+
+    return 2;
+}
+
+// 1552
+bool isMaxDistance(vector<int>& pos, int mid, int m) {
+    int cnt = 1, prev = pos[0];
+
+    for (int i = 1; i < pos.size() && (m - cnt) <= (pos.size() - i); i++) {
+        if (pos[i] - prev >= mid) {
+            prev = pos[i];
+            ++cnt;
+        }
+    }
+
+    return cnt >= m;
+}
+
+int maxDistance(vector<int>& pos, int m) {
+    if (m == 2) {
+        return *max_element(pos.begin(), pos.end()) - *min_element(pos.begin(), pos.end());
+    }
+
+    sort(pos.begin(), pos.end());
+    int left = 1, right = pos[pos.size() - 1];
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (!isMaxDistance(pos, mid, m))
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left - 1;
+}
+
+int rangeSum(vector<int>& nums, int n, int left, int right) {
+    // priority queue less
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> mqueue;
+    for (int i = 0; i < n; i++)
+        mqueue.push({ nums[i], i + 1 });
+
+    int ans = 0, mod = 1e9 + 7;
+    for (int i = 1; i <= right; i++) {
+        auto p = mqueue.top();
+        mqueue.pop();
+        if (i >= left)
+            ans = (ans + p.first) % mod;
+        if (p.second < n) {
+            p.first += nums[p.second++];
+            mqueue.push(p);
+        }
+    }
+    return ans;
+
+    /*
+    another solution
+    vector<int> sums { };
+    for (int i = 0; i < n; i++) {
+        int prefixSum = 0;
+        for (int j = i; j < n; j++) {
+            prefixSum += nums[j];
+            sums.push_back(prefixSum);
+        }
+    }
+    sort(begin(sums), end(sums));
+    // accumulate func er data return based on third arguments
+    int res = accumulate(sums.begin() + left - 1, sums.begin() + right, 0LL) % 1000000007;
+    return res;
+    */
+}
+
+// 6367
+int maxNumOfMarkedIndices(vector<int>& nums) {
+    if (nums.size() == 1) return 0;
+    sort(nums.begin(), nums.end());
+    int cnt = 0, n = nums.size();
+
+    for (int i = 0, j = (n + 1) / 2; i < (n+1)/2; i++) {
+        while (j < n) {
+            if (2 * nums[i] <= nums[j]) {
+                cnt += 2;
+                j++;
+                break;
+            }
+            else
+                j++;
+        }
+    }
+
+    return cnt;
+}
+
+// 6368
+vector<int> divisibilityArray(string word, int m) {
+    vector<int> ans;
+    int num = 0, dig = 0, rem = 0;
+
+    for (auto c : word) {
+        dig = c - '0';
+        num = rem * 10 + dig;
+        if (num % m == 0) ans.push_back(1);
+        else ans.push_back(0);
+    }
+    return ans;
+
+}
+
+// 6369
+vector<int> leftRigthDifference(vector<int>& nums) {
+    int rSum = 0, lSum = 0;
+    for (auto num : nums) rSum += num;
+
+    vector<int> ans;
+    for (auto num : nums) {
+        rSum -= num;
+        ans.push_back(abs(rSum - lSum));
+        lSum += num;
+    }
+    return ans;
+}
+
+// 23
+ListNode* mergeKLists(vector<ListNode*>& lists) {
+    ListNode* ansList = new ListNode(-100001);
+
+    for (int i = 0; i < lists.size(); i++) {
+        ListNode* ansHead = ansList;
+        ListNode* cur = lists[i];
+
+        while (cur) {
+            // for the rest of the nodes
+            if (!ansHead->next) {
+                ansHead->next = cur;
+                break;
+            }
+            // for middle nodes
+            else if (cur->val <= ansHead->next->val){
+                auto temp = ansHead->next;
+                ansHead->next = cur;
+                cur = cur->next;
+                ansHead->next->next = temp;
+                ansHead = ansHead->next;
+            }
+            else {
+                ansHead = ansHead->next;
+            }
+        }
+    }
+    return ansList->next;
+}
+
+// 540
+bool isRight(vector<int>& nums, int mid) {
+    if (nums[mid] == nums[mid + 1]) {
+        if (mid % 2 == 0) return false;
+        else return true;
+    } 
+    else {
+        if (mid % 2 == 1) return false;
+        else return true;
+    }
+}
+
+int singleNonDuplicate(vector<int>& nums) {
+    int n = nums.size();
+    if (n == 1) return nums[0];
+    int left = 0, right = n;
+
+    while (right - left) {
+        int mid = left + (right - left) / 2;
+
+        if (isRight(nums, mid))
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return nums[left];
+}
+
+// 1760
+bool isValidminimumSize(vector<int>& nums, int mid, int op) {
+    int cnt = 0;
+
+    for (auto num : nums) {
+        if (num > mid) cnt += (num - 1) / mid;
+    }
+
+    return cnt <= op;
+}
+
+int minimumSize(vector<int>& nums, int maxOperations) {
+    int left = 1, right = *max_element(nums.begin(), nums.end());
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (isValidminimumSize(nums, mid, maxOperations))
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left;
+}
+
+ListNode* detectCycle(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+
+    do {
+        if (!fast || !fast->next) return NULL;
+        slow = slow->next;
+        fast = fast->next->next;
+    } while (slow != fast);
+
+    slow = head;
+    while (slow != fast) {
+        slow = slow->next;
+        fast = fast->next;
+    }
+    return slow;
+}
+
+// 287
+// by using floyd's cycle detection algorithm
+int findDuplicate(vector<int>& nums) {
+    int fast = 0, slow = 0;
+
+    do {
+        slow = nums[slow];
+        fast = nums[nums[fast]];
+    } while (fast != slow);
+
+    slow = 0;
+    while (fast != slow) {
+        slow = nums[slow];
+        fast = nums[fast];
+    }
+    return slow;
+}
+
+// 2498
+int maxJump(vector<int>& stones) {
+    int mx = 0, n = stones.size();
+
+    for (int i = 1; i < n - 1; i++) {
+        mx = max(mx, max(stones[i]-stones[i-1], stones[i+1]-stones[i-1]));
+    }
+    // for last element
+    mx = max(mx, (stones[n-1] - stones[n-2]));
+
+    return mx;
+}
+
+// 378
+int binarySearchToCountSmaller(vector<int>& vec, int val) {
+    int left = 0, right = vec.size();
+
+    if (vec[left] > val) return left;
+    if (vec[right - 1] < val) return right;
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (vec[mid] > val)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left;
+}
+
+bool isThereMorethanKth(vector<vector<int>>& mat, int k, int mid) {
+    int cnt = 0;
+
+    for (int i = 0; i < mat.size(); i++) {
+        cnt += binarySearchToCountSmaller(mat[i], mid);
+
+        if (cnt >= k) return true;
+    }
+
+    return false;
+}
+
+int kthSmallest(vector<vector<int>>& matrix, int k) {
+    int n = matrix.size();
+    int low = matrix[0][0], high = matrix[n - 1][n - 1];
+
+    while (low < high) {
+        int mid = low + (high - low) / 2;
+        if (isThereMorethanKth(matrix, k, mid))
+            high = mid;
+        else
+            low = mid + 1;
+    }
+    return low;
+}
+
+// 2517
+int isValidMaxTastiness(vector<int>& price, int val, int k) {
+    int count = 1, prev_val = price[0];
+    for (int i = 1; i < price.size(); i++) {
+        if (abs(prev_val - price[i]) >= val) {
+            prev_val = price[i];
+            count++;
+        }
+        if (count >= k) return true;
+    }
+    return false;
+}
+
+int maximumTastiness(vector<int>& price, int k) {
+    int left = 1, right = 1000000000;
+    sort(price.begin(), price.end());
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (isValidMaxTastiness(price, mid, k)) {
+            left = mid + 1;
+        }
+        else
+            right = mid;
+    }
+    return left - 1;
+}
+
+// 2358
+int maximumGroups(vector<int>& grades) {
+    int left = 0, right = 1000, n = grades.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (mid * (mid + 1) / 2 > n)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left;
+}
+
+// 852
+int peakIndexInMountainArray(vector<int>& arr) {
+    int left = 1, right = arr.size() - 1;
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] >= arr[mid+1])
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left;
+}
+
+long long minCost(vector<int>& b1, vector<int>& b2) {
+    unordered_map<int, int> cnt;
+    for (auto c : b1) cnt[c]++;
+    for (auto c : b2) cnt[c]--;
+    vector<int> vec;
+
+    for (auto &[k, v] : cnt) {
+        if (v % 2) return -1;
+
+        for (int i = 0; i < abs(v) / 2; i++)
+            vec.push_back(k);
+    }
+
+    int minX = min(*min_element(b1.begin(), b1.end()), *min_element(b2.begin(), b2.end()));
+    sort(vec.begin(), vec.end());
+
+    long long res = 0;
+    for (int i = 0; i < vec.size() / 2; i++)
+        res += min(vec[i], minX * 2);
+
+    return res;
+}
+
+vector<int> vowelStrings(vector<string>& words, vector<vector<int>>& queries) {
+    vector<int> v, ans;
+    unordered_map<char, int> vowel;
+    vowel['a'] = 1;
+    vowel['e'] = 1;
+    vowel['i'] = 1;
+    vowel['o'] = 1;
+    vowel['u'] = 1;
+
+
+    int sum = 0;
+    for (auto word : words) {
+        if (vowel[word[0]] && vowel[word[word.size() - 1]])
+            sum += 1;
+        
+        v.push_back(sum);
+    }
+
+
+    for (auto q : queries) {
+        if (q[0] == 0)
+            ans.push_back(v[q[1]]);
+        else
+            ans.push_back(v[q[1]] - v[q[0]-1]);
+    }
+    return ans;
+}
+
+long long pickGifts(vector<int>& gifts, int k) {
+    long long ans = 0;
+    priority_queue<int> q;
+
+    for (auto gift : gifts) q.push(gift);
+
+    for (int i = 0; i < k; i++) {
+        int top = q.top(); q.pop();
+        top = pow(top, 0.5);
+        q.push(top);
+    }
+
+    while (!q.empty()) {
+        ans += q.top();
+        q.pop();
+    }
+    return ans;
+}
+
+// 953
+bool isAlienSorted(vector<string>& words, string order) {
+    vector<int> oDict(26, 0);
+
+    for (int i = 0; i < order.size(); i++) 
+        oDict[order[i] - 'a'] = i;
+
+    for (int i = 1; i < words.size(); i++) {
+        string a = words[i - 1], b = words[i];
+        for (int j = 0; j < a.size(); j++) {
+            if (j >= b.size()) 
+                return false;
+            if (a[j] != b[j]) {
+                if (oDict[a[j] - 'a'] > oDict[b[j] - 'a'])
+                    return false;
+                else
+                    break;
+            }
+        }
+    }
+
+    return true;
+}
+
+// 1071
+string modOfStrings(string a, string b) {
+    if (a.size() < b.size()) return a;
+    int rem = a.size() % b.size();
+    for (int i = 0; i < a.size(); i++) {
+        if (a[i] != b[i % b.size()]) return "f";
+    }
+
+    return rem == 0 ? "" : a.substr(a.size() - rem, rem);
+}
+
+string gcdOfStrings(string a, string b) {
+    if (a == "f" || b == "f") return "";
+    return b == "" ? a : gcdOfStrings(b, modOfStrings(a, b));
+}
+
+// 6339
+long long putMarbles(vector<int>& weights, int k) {
+    if (k == 1 || weights.size() == k) return 0;
+
+    long long mx = 0, mn = 0;
+    vector<int> pair_sum;
+    
+    for (int i = 1; i < weights.size(); i++) {
+        pair_sum.push_back(weights[i] + weights[i-1]);
+    }
+
+    sort(pair_sum.begin(), pair_sum.end());
+    for (int i = 0; i < k - 1; i++) mn += pair_sum[i];
+    for (int i = pair_sum.size() - 1; i > pair_sum.size() - k; i--) mx += pair_sum[i];
+    return mx - mn;
+}
+
+// 1539
+int findKthPositive(vector<int>& arr, int k) {
+    if (k < arr[0]) return k;
+    int n = arr.size();
+    if (k > arr[n - 1] - n) return k + n;
+    int left = 0, right = n;
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] - (mid + 1) >= k)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    //int res = (k - (arr[left - 1] - left)) + arr[left - 1];
+    return k + left;    
+}
+
+int isValidSpecial(int x, vector<int>& nums) {
+    int left = 0, right = nums.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (x <= nums[mid])
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    // here left = minimum index
+    int diff = nums.size() - left;
+    if (x == diff) return 1;
+    else if (x < diff) return 2; // increase x value
+    else return 0; // decrease x value
+}
+
+// 1608
+int specialArray(vector<int>& nums) {
+    sort(nums.begin(), nums.end());
+    if (nums[nums.size() - 1] == 0) return -1;
+    int left = 1, right = nums.size()+1;
+    int mid = -1;
+    while (left < right) {
+        mid = left + (right - left) / 2;
+        int val = isValidSpecial(mid, nums);
+        if (val == 1) return mid;
+        else if (val == 0)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return -1;
+}
+
+bool bsToFindElem(int num, vector<int>& arr) {
+    int left = 0, right = arr.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == num)
+            return true;
+        else if (arr[mid] > num)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return false;
+}
+
+// 888
+vector<int> fairCandySwap(vector<int>& aliceSizes, vector<int>& bobSizes) {
+    vector<int> v(2);
+    int aSum = 0, bSum = 0;
+    for (auto num : aliceSizes) aSum += num;
+    for (auto num : bobSizes) bSum += num;
+    sort(bobSizes.begin(), bobSizes.end());
+
+    //int dif = abs(aSum - bSum);
+    // x + (dif/2) = y
+    // 2y = bSum - aSum + x + x
+    for (auto x : aliceSizes) {
+        int y = (bSum - aSum + x + x) / 2;
+        if (bsToFindElem(y, bobSizes) && (aSum - x + y) == (bSum - y + x)) {
+            v[0] = x;
+            v[1] = y;
+            break;
+        }
+    }
+
+    return v;
+}
+
+// 268
+// using binary search
+int missingNumber(vector<int>& nums) {
+    int left = 0, right = nums.size();
+    sort(nums.begin(), nums.end());
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] > mid) right = mid;
+        else left = mid + 1;
+    }
+    return left;
+}
+
+// 1385
+bool bsToFindDistanceValue(int down, int up, vector<int>& arr2, int d) {
+    int left = 0, right = arr2.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (arr2[mid] > up)
+            right = mid;
+        else if (arr2[mid] < down)
+            left = mid + 1;
+        else
+            return false;
+    }
+    return true;
+}
+
+int findTheDistanceValue(vector<int>& arr1, vector<int>& arr2, int d) {
+    sort(arr2.begin(), arr2.end());
+    int count = 0;
+    for (auto num : arr1) {
+        int down = min((num - d), (num + d));
+        int up = max((num - d), (num + d));
+        if (bsToFindDistanceValue(down, up, arr2, d)) count++;
+    }
+
+    return count;
+}
+
+
+struct comparePQ {
+    bool operator()(const pair<int, int>& a, const pair<int, int>& b) {
+        if (a.first == b.first)
+            return a.second > b.second;
+        return a.first > b.first;
+    }
+};
+
+// 1337
+vector<int> kWeakestRows(vector<vector<int>>& mat, int k) {
+    priority_queue<pair<int, int>, vector<pair<int, int>>, comparePQ> pq;
+    vector<int> ans;
+    for (int i = 0; i < mat.size(); i++) {
+        int count = 0;
+        for (int j = 0; j < mat[0].size(); j++) {
+            if (mat[i][j] == 1) count++;
+        }
+        pq.push({count, i});
+    }
+
+    for (int i = 0; i < k; i++) {
+        ans.push_back(pq.top().second);
+        pq.pop();
+    }
+
+    return ans;
+}
 
 int binary_max_subSeq_sum(int q, vector<int>& nums) {
     int left = 0, right = nums.size();
@@ -550,9 +2649,10 @@ int shipWithinDays(vector<int>& weights, int days) {
 }
 
 //35
+// ideal binary search
 int searchInsert(vector<int>& nums, int target) {
 
-    int lo = 0, hi = nums.size() - 1;
+    int lo = 0, hi = nums.size();
 
     while (lo < hi) {
         int mid = lo + (hi - lo) / 2;
@@ -2046,5 +4146,18 @@ int minStoneSum(vector<int>& piles, int k) {
     return sum;
 }
 
+/*
+* 2d vector initialize with size and 0
+* vector<vector<int>> vis(r, vector<int>(c, 0));
+* 
+* unordered_set<char> vw({'a', 'e', 'i', 'o', 'u'});
+* 
+* 
+* // Sorting
+* vector<vector<int>>& tasks
+* sort(begin(tasks), end(tasks), [](const auto &t1, const auto &t2){
+        return t1[1] < t2[1];
+    });
+*/
 
 #endif 
