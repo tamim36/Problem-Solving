@@ -24,6 +24,9 @@
     <ClCompile Include="Archive.cpp">
       <Filter>Archived</Filter>
     </ClCompile>
+    <ClCompile Include="CustomTemplates.cpp">
+      <Filter>Archived</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Solution.h">
