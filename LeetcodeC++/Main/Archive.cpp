@@ -82,6 +82,601 @@ struct pair_hash {
 };
 
 
+
+
+
+
+// check 378 follow up question
+// study on this https://leetcode.com/problems/shortest-path-in-binary-matrix/discuss/313347/A*-search-in-Python
+
+
+
+/*
+* 2d vector initialize with size and 0
+* vector<vector<int>> vis(r, vector<int>(c, 0));
+*
+* unordered_set<char> vw({'a', 'e', 'i', 'o', 'u'});
+*
+* if (*rbegin(setTimes) + (j - i + 1) * sum > budget) {
+            sum -= costs[i];
+            setTimes.erase(setTimes.find(times[i++]));
+        }
+*
+*
+* // Sorting
+* // string sorting
+*
+* string ss = "hello";
+    sort(begin(ss), end(ss));
+*
+*
+* vector<vector<int>>& tasks
+* sort(begin(tasks), end(tasks), [](const auto &t1, const auto &t2){
+        return t1[1] < t2[1];
+    });
+
+  sort(people.begin(), people.end(), [](vector<int> v1, vector<int>v2) {
+        return v1[0] > v2[0] || (v1[0] == v2[0] && v1[1] < v2[1]);
+        });
+
+  vector<pair<char, int>> vec;
+  sort(vec.begin(), vec.end(), [](pair<char, int> p1, pair<char, int> p2) {
+            return p1.second > p2.second;
+            });
+
+
+            // method inside another method
+            int minOperationsOn(vector<int>& nums) {
+    int n = nums.size();
+    int one = 0;
+    for (int i = 0; i < n; i++) one += nums[i] == 1;
+    if (one) return n - one;
+    stack<int> la, ra, lg, rg;
+    auto good = [&]() {
+        int g = 0;
+        if (!la.empty()) g = gcd(g, lg.top());
+        if (!ra.empty()) g = gcd(g, rg.top());
+        return g == 1;
+    };
+    auto add = [&](int x) {
+        ra.push(x);
+        rg.push(gcd((rg.empty() ? 0 : rg.top()), x));
+    };
+    auto remove = [&]() {
+        if (la.empty()) {
+            while (!ra.empty()) {
+                int x = ra.top(); la.push(x); ra.pop(), rg.pop();
+                lg.push(gcd((lg.empty() ? 0 : lg.top()), x));
+            }
+        }
+        la.pop(), lg.pop();
+    };
+    int ans = n;
+    for (int l = 0, r = 0; r < n; r++) {
+        add(nums[r]);
+        while (l < n and good()) {
+            ans = min(ans, r - l);
+            remove(), l++;
+        }
+    }
+    if (ans == n) return -1;
+    return n + ans - 1;
+}
+
+    // short hand syntax technique
+    queue<pair<int, int>> q;
+    auto [r, c] = q.front();
+
+*/
+
+
+// 206
+ListNode* recursive_reverseList(ListNode* head, ListNode* newHead) {
+    if (head == NULL)
+        return newHead;
+    ListNode* temp = head->next;
+    head->next = newHead;
+    newHead = head;
+    recursive_reverseList(temp, newHead);
+}
+
+ListNode* reverseList(ListNode* head) {
+    ListNode* newHead = NULL;
+    return recursive_reverseList(head, newHead);
+}
+
+ListNode* reverseList2(ListNode* head) {
+    ListNode* cur = head;
+    ListNode* prev = NULL;
+    ListNode* temp = head;
+
+    while (cur->next) {
+        temp = cur->next;
+        cur->next = prev;
+        prev = cur;
+        cur = temp;
+    }
+
+    return cur;
+}
+
+// 142
+ListNode* detectCycle(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+
+        if (slow == fast)
+            break;
+    }
+
+    if (!fast || !fast->next)
+        return NULL;
+
+    fast = head;
+    while (fast != slow) {
+        fast = fast->next;
+        slow = slow->next;
+    }
+
+    return fast;
+}
+
+// 160
+ListNode* getIntersectionNode(ListNode* headA, ListNode* headB) {
+    if (!headA || !headB) return 0;
+
+    ListNode* nodeA = headA;
+    ListNode* nodeB = headB;
+
+    while (nodeA != nodeB) {
+        nodeA = nodeA->next ? nodeA->next : headB;
+        nodeB = nodeB->next ? nodeB->next : headA;
+    }
+
+    return nodeA;
+}
+
+// 876
+ListNode* middleNode(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+
+    return slow;
+}
+
+// 111
+int minDepth(TreeNode* root) {
+    if (!root)
+        return 0;
+    if (!root->left && !root->right)
+        return 1;
+
+    int left = minDepth(root->left);
+    int right = minDepth(root->right);
+
+    left = left == 0 ? INT_MAX : left;
+    right = right == 0 ? INT_MAX : right;
+
+    return 1 + min(left, right);
+}
+
+// 104
+int maxDepth(TreeNode* root) {
+    if (!root)
+        return 0;
+
+    return 1 + max(maxDepth(root->left), maxDepth(root->right));
+}
+
+
+// 2529
+int maximumCount(vector<int>& nums) {
+    int left = 0, right = nums.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (nums[mid] > 0)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    int posNumbers = nums.size() - left;
+
+    while (left > 0 && nums[left - 1] >= 0) {
+        left--;
+    }
+
+
+    return max(left, posNumbers);
+}
+
+//198
+int rob(vector<int>& nums) {
+    int odd = nums[0], eve = 0;
+
+    for (int i = 0; i < nums.size(); i++) {
+        if ((i + 1) % 2)
+            odd = nums[i] + max(odd, (eve - nums[i - 1]));
+        else
+            eve = nums[i] + max(eve, (odd - nums[i - 1]));
+    }
+
+    return max(odd, eve);
+}
+
+// 2786
+
+long long maxScore(vector<int>& n, int x) {
+    long long odd = n[0] - (n[0] % 2) ? 0 : x;
+    long long eve = n[0] - (n[0] % 2) ? x : 0;
+
+    for (int i = 1; i < n.size(); i++) {
+        if (n[i] % 2)
+            odd = n[i] + max(odd, eve - x);
+        else
+            eve = n[i] + max(eve, odd - x);
+    }
+
+    return max(odd, eve);
+}
+
+long long maxScore2(vector<int>& nums, int x) {
+    long long val = 0;
+    vector<int> vec;
+    vec.push_back(nums[0]);
+
+    for (int i = 1; i < nums.size(); i++) {
+        int last = vec.back(); vec.pop_back();
+
+        if (last % 2 == nums[i] % 2) {
+            vec.push_back(last + nums[i]);
+        }
+        else {
+            vec.push_back(last);
+            vec.push_back(nums[i]);
+        }
+    }
+
+    val += nums[0];
+    for (int i = 1; i < vec.size(); i++) {
+        if (i % 2 && nums[i] - x > 0)
+            val += nums[i];
+    }
+
+    return val;
+}
+
+string sortVowels(string s) {
+    unordered_set<char> vow{ 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U' };
+    vector<int> vec;
+
+    for (auto c : s) {
+        if (vow.count(c))
+            vec.push_back(int(c));
+    }
+
+    sort(vec.begin(), vec.end());
+    int v = 0;
+    string ans = "";
+
+    for (auto c : s) {
+        if (vow.count(c))
+            ans += char(vec[v++]);
+        else
+            ans += c;
+    }
+
+    return ans;
+}
+
+
+bool isGood(vector<int>& nums) {
+    sort(nums.begin(), nums.end());
+    int n = nums.size();
+
+    if (n == 1)
+        return false;
+
+    for (int i = 0; i < n - 1; i++)
+        if (nums[i] != i + 1)
+            return false;
+
+    if (nums[n - 1] != nums[n - 2] && nums[n - 1] != n - 1)
+        return false;
+
+    return true;
+}
+
+
+int maxResult(vector<int>& nums, int k) {
+    deque<int> dq;
+    int res[6];
+
+    for (int i = 0; i < nums.size(); i++)
+    {
+        while (!dq.empty() && i - dq.front() > k)
+            dq.pop_front();
+
+        res[i] = dq.empty() ? nums[i] : nums[i] + res[dq.front()];
+
+        while (!dq.empty() && res[dq.back()] < res[i])
+            dq.pop_back();
+        dq.push_back(i);
+    }
+
+
+    return res[nums.size() - 1];
+}
+
+// 45
+int jump(vector<int>& nums) {
+    int cnt = 0, n = nums.size();
+    if (n <= 2)
+        return n;
+
+    for (int i = 0; i < n; i++) {
+        int len = i + nums[i] + 1;
+        len = min(len, n);
+        if (len == n)
+            return cnt + 1;
+        int mx = -1;
+        for (int j = i + 1; j < len; j++) {
+            if (j + nums[j] >= mx) {
+                mx = j + nums[j];
+                i = j - 1;
+            }
+        }
+        cnt++;
+    }
+    return cnt - 1;
+}
+
+int minimumBeautifulSubstrings2(string s) {
+    int n = s.length();
+    vector<int> dp(n + 1, n + 1);
+    dp[0] = 0;
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '0') continue;
+        for (int j = i, cur = 0; j < n; j++) {
+            cur = cur * 2 + s[j] - '0';
+            if (15625 % cur == 0)
+                dp[j + 1] = min(dp[j + 1], dp[i] + 1);
+        }
+    }
+    return dp[n] > n ? -1 : dp[n];
+}
+
+int minimumBeautifulSubstrings(string s) {
+    vector<string> pats{ "11110100001001", "110000110101", "1001110001", "1111101", "11001", "101", "1" };
+    int cnt = 0;
+
+    for (int i = 0; i < pats.size(); i++) {
+        while (true) {
+            size_t pos = s.find(pats[i]);
+
+            if (pos != string::npos && (pos == 0 || s[pos - 1] != '0')) {
+                s.replace(s.find(pats[i]), pats[i].length(), "2");
+                cnt++;
+            }
+            else
+                break;
+        }
+    }
+    for (auto c : s)
+        if (c == '0')
+            return -1;
+
+    return cnt == 0 ? -1 : cnt;
+}
+
+// https://leetcode.com/contest/biweekly-contest-108/problems/partition-string-into-minimum-beautiful-substrings/
+
+// 6469
+vector<int> relocateMarbles(vector<int>& nums, vector<int>& moveFrom, vector<int>& moveTo) {
+    unordered_set<int> st;
+    for (auto num : nums)
+        st.insert(num);
+
+    for (int i = 0; i < moveFrom.size(); i++) {
+        if (st.count(moveFrom[i])) {
+            st.erase(moveFrom[i]);
+            st.insert(moveTo[i]);
+        }
+    }
+
+    vector<int> ans;
+
+    for (auto s : st)
+        ans.push_back(s);
+
+    sort(ans.begin(), ans.end());
+    return ans;
+}
+
+struct pair_hash {
+    inline std::size_t operator()(const std::pair<int, int>& v) const {
+        return v.first * 31 + v.second;
+    }
+};
+
+vector<long long> countBlackBlocks(int m, int n, vector<vector<int>>& coordinates) {
+    vector<long long> vec(5, 0);
+    vector<vector<int>> grid(m, vector<int>(n, 0));
+
+    for (auto v : coordinates)
+        grid[v[0]][v[1]] = 1;
+
+    for (int i = 0; i < m - 1; i++) {
+
+        for (int j = 0; j < n - 1; j++) {
+            int cnt = 0;
+            if (grid[i][j]) cnt++;
+            if (grid[i + 1][j]) cnt++;
+            if (grid[i][j + 1]) cnt++;
+            if (grid[i + 1][j + 1]) cnt++;
+            vec[cnt]++;
+        }
+
+    }
+    return vec;
+}
+
+vector<long long> countBlackBlocks_2(int m, int n, vector<vector<int>>& coordinates) {
+    vector<long long> vec(5, 0);
+    unordered_set<pair<int, int>, pair_hash> st;
+
+    for (auto v : coordinates)
+        st.insert({ v[0], v[1] });
+
+    for (int i = 0; i < m - 1; i++) {
+
+        for (int j = 0; j < n - 1; j++) {
+            int cnt = 0;
+            if (st.count({ i, j })) cnt++;
+            if (st.count({ i + 1, j })) cnt++;
+            if (st.count({ i, j + 1 })) cnt++;
+            if (st.count({ i + 1, j + 1 })) cnt++;
+            vec[cnt]++;
+        }
+
+    }
+    return vec;
+}
+
+// 6913
+int alternatingSubarray(vector<int>& nums) {
+    int len = -1, n = nums.size();
+    bool isGet = false;
+
+    for (int i = 0; i < n; i++) {
+        int cur = 1;
+        isGet = false;
+        int j = i + 1;
+        for (; j < n; j++) {
+            if ((nums[j] - nums[j - 1]) == cur) {
+                isGet = true;
+                cur = cur * (-1);
+            }
+            else
+                break;
+        }
+        len = isGet ? max(len, j - i) : len;
+    }
+
+    return len;
+}
+
+// 934
+int shortestBridge(vector<vector<int>>& grid) {
+    int m = grid.size(), n = grid[0].size();
+    vector<vector<int>> cal(m, vector<int>(n, -1));
+    queue<pair<int, int>> q;
+    vector<pair<int, int>> one_group;
+
+    int dx[] = { 1, -1, 0, 0 };
+    int dy[] = { 0, 0, 1, -1 };
+
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (grid[i][j]) {
+                q.push({ i, j });
+                cal[i][j] = 0;
+                i = m;
+                break;
+            }
+        }
+    }
+
+    while (!q.empty())
+    {
+        auto top = q.front(); q.pop();
+        one_group.push_back(top);
+
+        for (int i = 0; i < 4; i++) {
+            int x = top.first + dx[i], y = top.second + dy[i];
+            if (x < 0 || y < 0 || x >= m || y >= n)
+                continue;
+            else if (grid[x][y] && cal[x][y] == -1) {
+                q.push({ x, y });
+                cal[x][y] = 0;
+            }
+        }
+    }
+
+    for (auto one : one_group)
+        q.push(one);
+
+    int cnt = -1;
+    while (!q.empty()) {
+        int sz = q.size();
+        cnt++;
+
+        while (sz--) {
+            auto top = q.front(); q.pop();
+
+            for (int i = 0; i < 4; i++) {
+                int x = top.first + dx[i], y = top.second + dy[i];
+                if (x < 0 || y < 0 || x >= m || y >= n)
+                    continue;
+                if (cal[x][y] == -1) {
+                    if (!grid[x][y]) {
+                        q.push({ x, y });
+                        cal[x][y] = 0;
+                    }
+                    else
+                        return cnt;
+                }
+            }
+        }
+    }
+    return cnt;
+}
+
+
+class UnionFindTemplate
+{
+    vector<int> parent, rank;
+public:
+    UnionFindTemplate() {
+
+    }
+
+    int find(int u) {
+        if (u = parent[u])
+            return u;
+
+        return parent[u] = find(parent[u]);
+    }
+
+    void combine(int u, int v) {
+        u = find(u);
+        v = find(v);
+
+        if (u == v)
+            return;
+
+        if (rank[u] > rank[v]) {      // shoshomoi chotor abbu change hye jabe
+            parent[v] = u;
+            rank[u] += rank[v];       // can be used rank[u]++  otherwise this can be overflown easily
+        }
+        else {
+            parent[u] = v;
+            rank[v] += rank[u];
+        }
+    }
+};
+
 // 1765
 vector<vector<int>> highestPeak(vector<vector<int>>& maze) {
     int m = maze.size(), n = maze[0].size();

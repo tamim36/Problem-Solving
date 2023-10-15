@@ -7,12 +7,12 @@
 //#include "SortingAlgorithms.h"
 
 TreeNode* buildManualTree() {
-    TreeNode* tree = new TreeNode(1);
-    tree->left = new TreeNode(2);
-    tree->right = new TreeNode(3);
+    TreeNode* tree = new TreeNode(5);
+    tree->left = new TreeNode(3);
+    tree->right = new TreeNode(9);
 
-    //tree->left->left = new TreeNode(4);
-    //tree->left->right = new TreeNode(5);
+    tree->left->left = new TreeNode(-2147483648);
+    tree->left->right = new TreeNode(2);
 
     //tree->right->left = new TreeNode(6);
     //tree->right->right = new TreeNode(7);
@@ -75,7 +75,7 @@ void visualizeMatrix(vector<vector<int>>& grid) {
 int main()
 {
     std::cout << "Hello World!\n";
-    vector<int> vect1{ 4, 4, 4 };
+    vector<int> vect1{ 2, 2, 1 };
     vector<char> chvect{ 'A','A','A','B','B','B', 'C','C','C', 'D', 'D', 'E' };
     //int a = Solution::maximumTop(vect, 5);
 
@@ -93,7 +93,7 @@ int main()
         {"John","johnnybravo@mail.com"}
     };
 
-    string vect2dStr = "[[0,0]]";
+    string vect2dStr = "[0,1],[0,2]";
     string vect2dStr1 = "[[5,5],[5,0],[4,4],[0,3],[1,0]]";
     vector<vector<int>> vect2d = parseStringToMatrix(vect2dStr);
     vector<vector<int>> vect2d1 = parseStringToMatrix(vect2dStr1);
@@ -119,13 +119,16 @@ int main()
     
     TreeNode* c = buildManualTree();
 
-    ListNode* al = buildListNode({1,2,3,4});
+    ListNode* al = buildListNode({1,2,3,4,5});
     ListNode* bl = buildListNode({2,4,6});
     ListNode* cl = buildListNode({2,6});
 
     vector<ListNode*> vln = { al, bl, cl };
 
-    auto res = countBlackBlocks(3,3, vect2d);
+    int arr[] = { 5,2,3,1,6,7,2 };
+    // recoverTree(c);
+
+    auto res = canSplitArray(vect1, 4);
 
     //cout << b << endl;
 }
