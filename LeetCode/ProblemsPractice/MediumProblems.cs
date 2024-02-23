@@ -7,6 +7,186 @@ namespace ProblemsPractice
 {
     public class MediumProblems
     {
+        // 47
+        public IList<IList<int>> PermuteUnique(int[] nums)
+        {
+            IList<IList<int>> res = new List<IList<int>>();
+            recur_permuteUnique(res, 0, nums);
+            return res;
+        }
+
+        private void recur_permuteUnique(IList<IList<int>> res, int idx, int[] nums)
+        {
+            if (idx == nums.Length)
+            {
+                res.Add(nums.ToList());
+                return;
+            }
+
+            ISet<int> visited = new HashSet<int>();
+            for (int i = idx; i < nums.Length; i++)
+            {
+                if (!visited.Add(nums[i]))
+                {
+                    continue;
+                }
+
+                var tmp = nums[idx];
+                nums[idx] = nums[i];
+                nums[i] = tmp;
+
+                recur_permuteUnique(res, idx + 1, nums);
+
+                tmp = nums[idx];
+                nums[idx] = nums[i];
+                nums[i] = tmp;
+            }
+        }
+
+        // 2389
+        public int[] AnswerQueries(int[] nums, int[] queries)
+        {
+            Array.Sort(nums);
+            int[] answer = new int[queries.Length];
+
+            for (int i = 1; i < nums.Length; i++)
+            {
+                nums[i] += nums[i - 1];
+            }
+
+            for (int i = 0; i < queries.Length; i++)
+            {
+                answer[i] = binarySearchAnswerQueries(nums, queries[i]);
+            }
+
+            return answer;
+        }
+
+        public int binarySearchAnswerQueries(int[] nums, int val)
+        {
+            int left = 0, right = nums.Length;
+
+            while (left < right)
+            {
+                int mid = left + (right - left) / 2;
+
+                if (val < nums[mid])
+                    right = mid;
+                else
+                    left = mid + 1;
+            }
+
+            return left;
+        }
+
+        // 1658
+        public int MinOperations(int[] nums, int x)
+        {
+            int sz = nums.Length;
+            int rem = nums.Sum();
+            rem -= x;
+
+            if (rem == 0) return sz;
+            if (rem < 0) return -1;
+
+            IDictionary<int, int> map = new Dictionary<int, int>();
+            map.Add(0, -1);
+
+            int curSum = 0, res = int.MinValue;
+            for (int i = 0; i < sz; i++)
+            {
+                curSum += nums[i];
+
+                if (map.ContainsKey(curSum - rem))
+                    res = Math.Max(res, i - map[curSum - rem]);
+
+                map.Add(curSum, i);
+            }
+
+            return res == int.MinValue ? -1 : sz - res;
+        }
+
+        // 417
+        public IList<IList<int>> PacificAtlantic(int[][] heights)
+        {
+            IList<IList<int>> ans = new List<IList<int>>();
+            int m = heights.Length, n = heights[0].Length;
+            bool[][] pacific = new bool[m][];
+            bool[][] atlantic = new bool[m][];
+
+            for (int i = 0; i < m; i++)
+            {
+                pacific[i] = new bool[n];
+                atlantic[i] = new bool[n];
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                dfs_PacificAtlantic(heights, pacific, int.MinValue, i, 0);
+                dfs_PacificAtlantic(heights, atlantic, int.MinValue, i, n-1);
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                dfs_PacificAtlantic(heights, pacific, int.MinValue, 0, i);
+                dfs_PacificAtlantic(heights, atlantic, int.MinValue, m-1, i);
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (atlantic[i][j])
+                        Console.Write($"x ");
+                    else Console.Write($"o ");
+                }
+                Console.WriteLine();
+            }
+
+            for (int i = 0; i < m; i++)
+                for (int j = 0; j < n; j++)
+                    if (pacific[i][j] && atlantic[i][j])
+                        ans.Add(new List<int>() { i, j});
+            
+            return ans;
+        }
+
+        int[][] dir = new int[][] { new int[] { 0, 1 }, new int[] { 0, -1 }, new int[] { 1, 0 }, new int[] { -1, 0 } };
+        public void dfs_PacificAtlantic(int[][] heights, bool[][] visited, int height, int x, int y)
+        {
+            if (visited[x][y]) return;
+            visited[x][y] = true;
+            Console.WriteLine("height: " + height + " ; Height x y: " + heights[x][y]);
+            for (int i = 0; i < 4; i++)
+            {
+                int xx = x + dir[i][0], yy = y + dir[i][1];
+                
+                if (xx >= 0 && xx < heights.Length && yy >= 0 && yy < heights[0].Length
+                    && heights[x][y] <= heights[xx][yy] && !visited[xx][yy])
+                    dfs_PacificAtlantic(heights, visited, heights[x][y], xx, yy);
+            }
+        }
+        /*
+        public void dfs_PacificAtlantic(int[][] matrix, bool[][] visited, int height, int x, int y)
+        {
+            int n = matrix.Length, m = matrix[0].Length;
+            if (x < 0 || x >= n || y < 0 || y >= m || visited[x][y] || matrix[x][y] < height)
+                return;
+            visited[x][y] = true;
+            foreach (int[] d in dir)
+            {
+                dfs_PacificAtlantic(matrix, visited, matrix[x][y], x + d[0], y + d[1]);
+            }
+        }*/
+
+        // 1306
+        public bool CanReach(int[] arr, int idx)
+        {
+            return 0 <= idx && idx < arr.Length
+                && arr[idx] <= 0 && ((arr[idx] = -arr[idx]) == 0
+                || CanReach(arr, idx - arr[idx]) || CanReach(arr, idx + arr[idx]));  
+        }
+
         // 2685
         public int CountCompleteComponents(int n, int[][] edges)
         {

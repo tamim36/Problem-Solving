@@ -30,7 +30,7 @@ namespace ProblemsPractice
 
             var num1 = new int[]
             {
-                8,5,1,7,10,12
+                2, 2, 3, 3
             };
 
             var stAr = new string[]
@@ -45,10 +45,11 @@ namespace ProblemsPractice
 
             var twoDimensionalJaggedArray = new int[][]
             {
-                new int[] {7,1,4,5,6},
-                new int[] { 2, 5, 1, 6, 4 },
-                new int[] { 1, 5, 4, 3, 2 },
-                new int[] { 1, 2, 7, 3, 4 }
+                new int[] {1,2,2,3,5},
+                new int[] {3,2,3,4,4},
+                new int[] {2,4,5,3,1},
+                new int[] { 6, 7, 1, 4, 5 },
+                new int[] { 5,1,1,2,4 },
             };
             string str = "1 box has 3 blue 4 red 6 green and 12 yellow marbles";
             string s2 = "p#######";
@@ -114,11 +115,11 @@ namespace ProblemsPractice
             sortedList.Add((22, 30));
             sortedList.Add((30, 32));
             MyCalendar mc = new MyCalendar(sortedList);
-            var ans = mc.Book(5, 10);
+            //var ans = mc.Book(5, 10);
 
-            //var scls = new MediumBSTProblems();
+            var scls = new MediumProblems();
 
-            //var a = scls.LcaDeepestLeaves(nT);
+            var a = scls.PermuteUnique(num1);
             
             //DesignProblemsCalling(new string[0], new int[0]);
         }

@@ -73,6 +73,79 @@ struct TreeNode {
     TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
 };
 
+// 300 lis, lis_path, template
+vector<int> path_of_lis(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> trace(n, -1), subIndx, subArr;
+    subIndx.push_back(0);
+    subArr.push_back(nums[0]);
+
+    for (int i = 1; i < n; i++) {
+        if (nums[i] > subArr[subArr.size() - 1]) {
+            trace[i] = subIndx[subIndx.size() - 1];
+            subIndx.push_back(i);
+            subArr.push_back(nums[i]);
+        }
+        else {
+            int idx = lower_bound(subArr.begin(), subArr.end(), nums[i]) - subArr.begin();
+            if (idx != 0)
+                trace[i] = subIndx[idx - 1];
+
+            subIndx[idx] = i;
+            subArr[idx] = nums[i];
+        }
+    }
+
+    vector<int> path;
+    int val = subIndx[subIndx.size() - 1];
+    //path.push_back(val);
+
+    while (val != -1) {
+        path.push_back(nums[val]);
+        val = trace[val];
+    }
+
+    reverse(path.begin(), path.end());
+
+    return path;
+}
+
+
+// 300 lis, template
+int lis_binarySearch(vector<int>& vec, int num) {
+    int left = 0, right = vec.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (vec[mid] >= num)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left;
+}
+
+int lengthOfLIS(vector<int>& nums) {
+    int sz = nums.size();
+    if (sz <= 1)
+        return sz;
+
+    vector<int> lis;
+    lis.push_back(nums[0]);
+
+    for (int i = 1; i < sz; i++) {
+        if (lis.back() < nums[i])
+            lis.push_back(nums[i]);
+        else {
+            int idx = lis_binarySearch(lis, nums[i]);
+            lis[idx] = nums[i];
+        }
+    }
+
+    return lis.size();
+}
 
 // 684
 // template union find

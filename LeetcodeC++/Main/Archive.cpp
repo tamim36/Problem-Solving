@@ -168,7 +168,1496 @@ struct pair_hash {
     auto [r, c] = q.front();
 
 */
+string arrayToString(vector<int>& arr) {
+    string arr_str = "";
+    for (auto val : arr) {
+        arr_str += to_string(val);
+    }
 
+    return arr_str;
+}
+
+vector<int> getNeighborsForOneDArray(int index) {
+    vector<int> neighbors;
+    if ((index + 1) % 3 != 0) neighbors.push_back(index + 1);
+    if ((index % 3) != 0) neighbors.push_back(index - 1);
+    if (index <= 5) neighbors.push_back(index + 3);
+    if (index >= 3) neighbors.push_back(index - 3);
+
+    return neighbors;
+}
+
+int minimumMoves(vector<vector<int>>& grid) {
+    vector<int> one_d_grid(9);
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            one_d_grid[i * 3 + j] = grid[i][j];
+        }
+    }
+
+    unordered_set<string> unique_states;
+    queue<string> q;
+    string gridStr = arrayToString(one_d_grid);
+    q.push(gridStr);
+    unique_states.insert(gridStr);
+
+    int moves = 0;
+    while (!q.empty()) {
+        int sz = q.size();
+
+        for (int i = 0; i < sz; i++) {
+            string cur_state = q.front(); q.pop();
+            bool isValid = true;
+            for (int k = 0; k < 9; k++) {
+                if (cur_state[k] - '0' > 1) {
+                    isValid = false;
+                    for (auto nei : getNeighborsForOneDArray(k)) {
+                        string new_state = cur_state;
+                        new_state[k] = (int)new_state[k] - 1;
+                        new_state[nei] = (int)new_state[nei] + 1;
+
+                        if (!unique_states.count(new_state)) {
+                            q.push(new_state);
+                            unique_states.insert(new_state);
+                        }
+                    }
+                }
+            }
+            if (isValid)
+                return moves;
+        }
+        moves++;
+    }
+
+    return moves;
+}
+
+string arrayToString2(vector<int> arr) {
+    string str = "";
+    for (auto& val : arr) {
+        str += to_string(val);
+    }
+    return str;
+}
+
+vector<int> getAdjacentCells(int index) {
+    vector<int> adj;
+    if (index % 3 != 0) adj.push_back(index - 1);
+    if (index % 3 != 2) adj.push_back(index + 1);
+    if (index / 3 != 0) adj.push_back(index - 3);
+    if (index / 3 != 2) adj.push_back(index + 3);
+    return adj;
+}
+
+int minimumMoves2(vector<vector<int>>& grid) {
+    vector<int> start(9);
+    int moves = 0;
+    vector<int> target = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            start[i * 3 + j] = grid[i][j];
+        }
+    }
+
+    queue<vector<int>> Q;
+    unordered_set<string> visited;
+    Q.push(start);
+    visited.insert(arrayToString(start));
+    while (!Q.empty()) {
+        int size = Q.size();
+        for (int i = 0; i < size; i++) {
+            vector<int> cur = Q.front();
+            Q.pop();
+            if (cur == target) return moves;
+            for (int j = 0; j < 9; j++) {
+                if (cur[j] > 1) {
+                    for (auto& adj : getAdjacentCells(j)) {
+                        vector<int> newState = cur;
+                        newState[j]--;
+                        newState[adj]++;
+                        string state = arrayToString(newState);
+                        if (visited.find(state) == visited.end()) {
+                            visited.insert(state);
+                            Q.push(newState);
+                        }
+                    }
+                }
+            }
+        }
+        moves++;
+    }
+    return moves;
+}
+
+
+int minimumMoves_bfs(vector<vector<int>>& grid, queue<pair<int, int>>& q) {
+    int dx[] = { 1, -1, 0, 0 };
+    int dy[] = { 0,  0, 1, -1 };
+
+    vector<vector<int>> dis(3, vector<int>(3, 0));
+    int tot = 0;
+    int cnt = q.size();
+
+    while (!q.empty() && cnt) {
+        int x1 = q.front().first, y1 = q.front().second; q.pop();
+
+
+        queue<pair<int, int>> child_q;
+        bool isFound = false;
+        for (int i = 0; i < 4; i++) {
+            int x2 = x1 + dx[i], y2 = y1 + dy[i];
+
+            if (x2 >= 3 || x2 < 0 || y2 >= 3 || y2 < 0)
+                continue;
+
+            child_q.push({ x2, y2 });
+            dis[x2][y2] = dis[x2][y2] == 0 ? dis[x1][y1] + 1 : min(dis[x1][y1] + 1, dis[x2][y2]);
+            if (!grid[x2][y2]) {
+                grid[x2][y2] = 1;
+                tot += dis[x2][y2];
+                cnt--;
+
+                if (--grid[x1][y1] > 1) {
+                    q.push({ x1, y1 });
+                }
+                isFound = true;
+                break;
+            }
+        }
+
+        if (!isFound) {
+            while (!child_q.empty())
+            {
+                q.push(child_q.front()); child_q.pop();
+            }
+        }
+    }
+
+    return tot;
+
+}
+
+int minimumMoves3(vector<vector<int>>& grid) {
+    int total_moves = 0;
+    bool isAllOne = false;
+
+    queue<pair<int, int>> ones;
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (grid[i][j] > 1) {
+                ones.push({ i, j });
+            }
+        }
+    }
+
+    return minimumMoves_bfs(grid, ones);
+}
+
+// 47
+void recur_permuteUnique(unordered_map<int, int>& umap, vector<vector<int>>& ans, vector<int>& soFar, int n) {
+    if (soFar.size() == n) {
+        ans.push_back(soFar);
+        return;
+    }
+
+    for (auto kvp : umap) {
+        if (!kvp.second)
+            continue;
+
+        umap[kvp.first]--;
+        soFar.push_back(kvp.first);
+        recur_permuteUnique(umap, ans, soFar, n);
+        umap[kvp.first]++;
+        soFar.pop_back();
+    }
+}
+
+vector<vector<int>> permuteUnique(vector<int>& nums) {
+    unordered_map<int, int> umap;
+    for (auto num : nums)
+        umap[num]++;
+
+    vector<vector<int>> ans;
+    vector<int> soFar;
+    recur_permuteUnique(umap, ans, soFar, nums.size());
+
+    return ans;
+}
+
+// 2389
+int ansQuery_BinarySearch(vector<int>& nums, int val) {
+    int left = 0, right = nums.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (nums[mid] > val)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left - 1;
+}
+
+vector<int> answerQueries(vector<int>& nums, vector<int>& queries) {
+    sort(nums.begin(), nums.end());
+
+    int n = nums.size();
+    vector<int> prefix, ans;
+
+    for (int i = 0; i < n; i++) {
+        int val = nums[i];
+        val += prefix.empty() ? 0 : prefix.back();
+        prefix.push_back(val);
+    }
+
+    for (auto q : queries) {
+        ans.push_back(ansQuery_BinarySearch(prefix, q));
+    }
+
+    return ans;
+}
+
+int lastRemaining(int n) {
+    bool isHeadRemove = true;
+    int head = 1;
+    int step = 1;
+
+    int items = n;
+
+    while (items > 1) {
+        if (isHeadRemove || items % 2 == 1) {
+            head = head + step;
+        }
+
+        step *= 2;
+        isHeadRemove = !isHeadRemove;
+        items /= 2;
+    }
+
+    return head;
+}
+
+
+// 300 lis, lis_path, template
+vector<int> path_of_lis(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> trace(n, -1), subIndx, subArr;
+    subIndx.push_back(0);
+    subArr.push_back(nums[0]);
+
+    for (int i = 1; i < n; i++) {
+        if (nums[i] > subArr[subArr.size() - 1]) {
+            trace[i] = subIndx[subIndx.size() - 1];
+            subIndx.push_back(i);
+            subArr.push_back(nums[i]);
+        }
+        else {
+            int idx = lower_bound(subArr.begin(), subArr.end(), nums[i]) - subArr.begin();
+            if (idx != 0)
+                trace[i] = subIndx[idx - 1];
+
+            subIndx[idx] = i;
+            subArr[idx] = nums[i];
+        }
+    }
+
+    vector<int> path;
+    int val = subIndx[subIndx.size() - 1];
+    //path.push_back(val);
+
+    while (val != -1) {
+        path.push_back(nums[val]);
+        val = trace[val];
+    }
+
+    reverse(path.begin(), path.end());
+
+    return path;
+}
+
+
+// 300 lis, template
+int lis_binarySearch(vector<int>& vec, int num) {
+    int left = 0, right = vec.size();
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (vec[mid] >= num)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left;
+}
+
+int lengthOfLIS(vector<int>& nums) {
+    int sz = nums.size();
+    if (sz <= 1)
+        return sz;
+
+    vector<int> lis;
+    lis.push_back(nums[0]);
+
+    for (int i = 1; i < sz; i++) {
+        if (lis.back() < nums[i])
+            lis.push_back(nums[i]);
+        else {
+            int idx = lis_binarySearch(lis, nums[i]);
+            lis[idx] = nums[i];
+        }
+    }
+
+    return lis.size();
+}
+
+// 334
+bool increasingTriplet(vector<int>& nums) {
+    if (nums.size() < 3)
+        return false;
+
+    int a = nums[0], b = INT32_MAX;
+
+    for (int i = 1; i < nums.size(); i++) {
+        if (nums[i] > b)
+            return true;
+        else if (nums[i] > a && nums[i] < b)
+            b = nums[i];
+        else if (nums[i] < a)
+            a = nums[i];
+    }
+
+    return false;
+}
+
+// 300
+int lengthOfLIS2(vector<int>& nums) {
+    int sz = nums.size(), mxLenLis = 1;
+    vector<int> lis(sz, 1);
+
+    for (int i = 1; i < sz; i++) {
+        for (int j = 0; j < i; j++) {
+            if (nums[j] < nums[i]) {
+                lis[i] = max(lis[i], lis[j] + 1);
+                mxLenLis = max(mxLenLis, lis[i]);
+            }
+        }
+    }
+
+    return mxLenLis;
+}
+
+void recurPermutation4(vector<int>& nums, vector<vector<int>>& result, int i, int n) {
+    if (i == n) {
+        result.push_back(nums);
+        return;
+    }
+
+    for (int j = i; j <= n; j++) {
+        swap(nums[i], nums[j]);
+        recurPermutation4(nums, result, i + 1, n);
+        swap(nums[i], nums[j]);
+    }
+
+}
+
+vector<vector<int>> permute4(vector<int>& nums) {
+    vector<vector<int>> result;
+    recurPermutation4(nums, result, 0, nums.size() - 1);
+
+    return result;
+}
+
+// 78
+void backtrack_subset(vector<vector<int>>& ansList, vector<int>& tmpList, vector<int>& nums, int start) {
+    ansList.push_back(tmpList);
+
+    for (int i = start; i < nums.size(); i++) {
+        tmpList.push_back(nums[i]);
+
+        backtrack_subset(ansList, tmpList, nums, i + 1);
+
+        tmpList.pop_back();
+    }
+}
+
+vector<vector<int>> subsets(vector<int>& nums) {
+    vector<vector<int>> ansList;
+    sort(nums.begin(), nums.end());
+    vector<int> tmpList;
+    backtrack_subset(ansList, tmpList, nums, 0);
+    return ansList;
+}
+
+// 1657
+bool closeStrings(string word1, string word2) {
+    unordered_map<int, int> occurrence_count, w1_count, w2_count;
+    if (word1.size() != word2.size())
+        return false;
+
+    for (auto c : word1)
+        w1_count[c - 'a']++;
+
+    for (auto cnt1 : w1_count)
+        occurrence_count[cnt1.second]++;
+
+    for (auto c : word2) {
+        if (!w1_count[c - 'a'])
+            return false;
+        w2_count[c - 'a']++;
+    }
+
+    for (auto cnt2 : w2_count)
+        occurrence_count[cnt2.second]--;
+
+    for (auto occ : occurrence_count)
+        if (occ.second != 0)
+            return false;
+
+
+    return true;
+}
+
+// 2095
+ListNode* deleteMiddle(ListNode* head) {
+    ListNode* slow = head;
+    ListNode* fast = head;
+
+    if (!head->next)
+        return head->next;
+
+    while (slow->next && fast->next && fast->next->next && fast->next->next->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+
+
+    slow->next = slow->next->next;
+    return head;
+}
+
+// 1071
+int getGcDofStrings(int a, int b) {
+    if (a % b == 0)
+        return b;
+    return getGcDofStrings(b % a, a);
+}
+
+string gcdOfStrings(string str1, string str2) {
+    int sz1 = str1.size(), sz2 = str2.size();
+    int ansLen = getGcDofStrings(sz1, sz2);
+    string ans = "";
+
+    for (int i = 0, j = 0, x = 0; i < max(sz1, sz2); i++, j++) {
+        if (j == sz2)
+            j = 0;
+        if (i < sz1 && j < sz2 && str1[i] != str2[j])
+            return "";
+
+        if (i < ansLen)
+            ans += str1[i];
+
+
+        if (i >= ansLen && i < sz1 && str1[i] != ans[i % ansLen]) {
+            return "";
+        }
+        if (i >= ansLen && i < sz2 && str2[i] != ans[i % ansLen]) {
+            return "";
+        }
+
+    }
+
+    return ans;
+}
+
+string mergeAlternately(string word1, string word2) {
+    string ans = "";
+    int i = 0;
+
+    while (i < word1.size() || i < word2.size()) {
+        if (i < word1.size())
+            ans += word1[i];
+        if (i < word2.size())
+            ans += word2[i];
+        i++;
+    }
+
+    return ans;
+}
+
+string mergeAlternately2(string word1, string word2) {
+    string ans = "";
+
+    for (int i = 0, x = 0, y = 0; i < word1.size() + word2.size(); i++) {
+        if (i % 2 == 0) {
+            if (x < word1.size())
+                ans += word1[x++];
+            else
+                ans += word2[y++];
+        }
+        else {
+            if (y < word2.size())
+                ans += word2[y++];
+            else
+                ans += word1[x++];
+        }
+    }
+
+    return ans;
+}
+
+void recurPermutation(vector<int>& nums, vector<vector<int>>& result, int i, int n) {
+    if (i == n) {
+        result.push_back(nums);
+        return;
+    }
+
+    for (int j = i; j <= n; j++) {
+        swap(nums[i], nums[j]);
+        recurPermutation(nums, result, i + 1, n);
+        swap(nums[i], nums[j]);
+    }
+
+}
+
+vector<vector<int>> permute(vector<int>& nums) {
+    vector<vector<int>> result;
+    recurPermutation(nums, result, 0, nums.size() - 1);
+
+    return result;
+}
+
+void recursePermute(vector<int>& sofar, vector<int>& nums, vector<vector<int>>& ans, int sz) {
+    if (sz == sofar.size()) {
+        ans.push_back(sofar);
+        return;
+    }
+
+    for (int i = 0; i < nums.size(); i++) {
+        sofar.push_back(nums[i]);
+        vector<int> new_choices(nums);
+        new_choices.erase(new_choices.begin() + i);
+
+        recursePermute(sofar, new_choices, ans, sz);
+
+        sofar.pop_back();
+    }
+}
+
+vector<vector<int>> permute3(vector<int>& nums) {
+    vector<vector<int>> ans;
+    vector<int> sofar;
+    recursePermute(sofar, nums, ans, nums.size());
+    return ans;
+}
+
+vector<vector<int>> permute2(vector<int>& nums) {
+    int sz = nums.size();
+    vector<vector<int>> ans;
+    if (sz <= 1) {
+        ans.push_back(nums);
+        return ans;
+    }
+
+    vector<int> vec;
+    vec.push_back(nums[0]);
+    ans.push_back(vec);
+
+
+    for (int i = 1; i < sz; i++) {
+        vector<vector<int>> tmp;
+        while (!ans.empty()) {
+            auto v = ans.back();
+            ans.pop_back();
+
+            for (int j = 0; j <= i; j++) {
+                vector<int> vt(v);
+                vt.insert(vt.begin() + j, nums[i]);
+                tmp.push_back(vt);
+            }
+        }
+        ans = tmp;
+    }
+
+    return ans;
+}
+
+// https://leetcode.com/problems/largest-number/discuss/53298/Python-different-solutions-(bubble-insertion-selection-merge-quick-sorts)
+string largestNumber(vector<int>& nums) {
+    int n = nums.size();
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            string a = to_string(nums[j]) + to_string(nums[j + 1]), b = to_string(nums[j + 1]) + to_string(nums[j]);
+            if (a < b) {
+                int temp = nums[j];
+                nums[j] = nums[j + 1];
+                nums[j + 1] = temp;
+            }
+        }
+    }
+
+    string ans = "";
+    for (int i = 0; i < n; i++)
+        ans += to_string(nums[i]);
+
+    return ans;
+}
+
+// 179
+// https://leetcode.com/problems/largest-number/discuss/53298/Python-different-solutions-(bubble-insertion-selection-merge-quick-sorts)
+/*
+string largestNumber2(vector<int>& nums) {
+    int n = nums.size();
+    vector<string> nStr(n);
+
+    for (int i = 0; i < n; i++) {
+        nStr.push_back(to_string(nums[i]));
+    }
+
+    sort(nStr.begin(), nStr.end(), [](const string s1, const string s2) {
+        if (s1 + s2 > s2 + s1)
+            return s1;
+        else
+            return s2;
+        });
+    string ans = "";
+
+    for (int i = n - 1; i >= 0; i--) {
+        ans += nStr[i];
+    }
+
+    return ans;
+}*/
+
+// 1615
+int maximalNetworkRank(int n, vector<vector<int>>& roads) {
+    vector<vector<int>> adj(n);
+    vector<vector<int>> isConn(n, vector<int>(n, 0));
+
+    for (int i = 0; i < roads.size(); i++) {
+        int x = roads[i][0], y = roads[i][1];
+        adj[y].push_back(x);
+        adj[x].push_back(y);
+        isConn[x][y] = 1, isConn[y][x] = 1;
+    }
+
+    int max_rank = 0;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            int cur_rank = adj[i].size() + adj[j].size();
+            if (isConn[i][j])
+                cur_rank--;
+
+            max_rank = max(max_rank, cur_rank);
+        }
+    }
+
+
+
+    return max_rank;
+}
+
+
+// 849
+int maxDistToClosest(vector<int>& seats) {
+    int cur = 1, mx = 0;
+    bool st = true;
+
+    for (auto seat : seats) {
+        if (seat) {
+            if (st)
+                mx = max(cur - 1, mx), st = false;
+            else
+                mx = max(cur / 2, mx);
+
+            cur = 1;
+        }
+        else
+            cur++;
+    }
+
+    return max(cur - 1, mx);
+}
+
+/*
+int recurMinOperations(vector<int>& nums, int x, int l, int r) {
+    if (x < 0) return 10001;
+    else if (x == 0) return 0;
+    else
+        return min(1 + (l < nums.size()) ? recurMinOperations(nums, x-nums[l], l+1, r) : 10001,
+            1 + (r >= 0) ? recurMinOperations(nums, x-nums[r], l, r-1) : 10001);
+}*/
+
+// 1658
+
+int minOperations(vector<int>& nums, int x) {
+    long long tot = accumulate(nums.begin(), nums.end(), 0);
+    int sz = nums.size();
+    long long rem = tot - x;
+    int maxWindow = 0, curWindow = 0, curSum = 0;
+
+    if (tot == x) return sz;
+    if (tot > x) return -1;
+
+    curSum = nums[0];
+    for (int i = 0, j = 1; j < sz; ) {
+        if (curSum == rem)
+            maxWindow = max(maxWindow, j - i);
+
+        if (curSum <= rem)
+            curSum += nums[j];
+        if (curSum > rem)
+            curSum -= nums[i++];
+        if (curSum == rem)
+            maxWindow = max(maxWindow, j - i + 1);
+    }
+
+    return maxWindow == 0 ? -1 : sz - maxWindow;
+}
+
+int recurMinOperations(vector<int>& nums, vector<vector<int>>& dp, int x, int l, int r) {
+    if (l >= nums.size() || r < 0)
+        return 10001;
+    if (dp[l][r] >= 0)
+        return dp[l][r];
+    else if (x < 0) return 10001;
+    else if (x == 0) return 0;
+    else {
+        dp[l][r] = min(1 + recurMinOperations(nums, dp, (l < nums.size()) ? x - nums[l] : -1, l + 1, r), 1 + recurMinOperations(nums, dp, (r >= 0) ? x - nums[r] : -1, l, r - 1));
+        return dp[l][r];
+    }
+}
+
+int minOperations_dp_MLError(vector<int>& nums, int x) {
+    long long tot = accumulate(nums.begin(), nums.end(), 0);
+    int sz = nums.size();
+    // cout << sz << endl;
+
+    if (tot == x) return sz;
+    if (x > tot) return -1;
+
+    vector<vector<int>> dp(sz, vector<int>(sz, -1));
+    int ops = recurMinOperations(nums, dp, x, 0, sz - 1);
+    return ops > 10001 ? -1 : ops;
+}
+
+// 2487
+ListNode* removeNodes2(ListNode* head) {
+    ListNode dummy(INT_MAX);
+    vector<ListNode*> st{ &dummy };
+
+    for (auto cur = head; cur != nullptr; cur = cur->next) {
+        while (st.back()->val < cur->val)
+            st.pop_back();
+        st.back()->next = cur;
+        st.push_back(cur);
+    }
+
+    return dummy.next;
+}
+
+ListNode* removeNodes(ListNode* head) {
+    if (!head) return head;
+
+    head->next = removeNodes(head->next);
+    return head->next && head->val < head->next->val ? head->next->next : head->next;
+}
+
+// 1382
+void inOrderBalancedTree(TreeNode* root, vector<int>& v) {
+    if (!root)
+        return;
+    inOrderBalancedTree(root->left, v);
+    v.push_back(root->val);
+    inOrderBalancedTree(root->right, v);
+}
+
+TreeNode* buildTreeToBalanceBST(vector<int>& v, int l, int r) {
+    if (l < 0 || r > v.size() || l > r)
+        return NULL;
+
+    int mid = l + (r - l) / 2;
+    TreeNode* root = new TreeNode(v[mid]);
+    root->left = buildTreeToBalanceBST(v, l, mid - 1);
+    root->right = buildTreeToBalanceBST(v, mid + 1, r);
+    return root;
+}
+
+TreeNode* balanceBST(TreeNode* root) {
+    vector<int> v;
+    inOrderBalancedTree(root, v);
+
+    int l = 0, r = v.size() - 1;
+
+    TreeNode* a = buildTreeToBalanceBST(v, l, r);
+
+    return a;
+}
+
+// 18
+string vectorToString(vector<int>& v) {
+    string res = "";
+    for (auto i : v)
+        res += i;
+    return res;
+}
+
+vector<vector<int>> fourSum(vector<int>& nums, int target) {
+    sort(nums.begin(), nums.end());
+    int n = nums.size();
+    vector<vector<int>> ans;
+    unordered_set<string> ust;
+
+    for (int i = 0; i < n - 3; i++) {
+        for (int j = i + 1; j < n - 2; j++) {
+            long long rest = (target * 1ll) - (nums[i] + nums[j]);
+            int low = j + 1, high = n - 1;
+
+            while (low < high) {
+                if (nums[low] + nums[high] > rest)
+                    high--;
+                else if (nums[low] + nums[high] < rest)
+                    low++;
+                else {
+                    vector<int> temp = { nums[i], nums[j], nums[low], nums[high] };
+                    sort(temp.begin(), temp.end());
+                    string vs = vectorToString(temp);
+                    if (!ust.count(vs))
+                        ans.push_back(temp);
+                    ust.insert(vs);
+                    low++;
+                }
+            }
+        }
+    }
+
+    return ans;
+}
+
+// 417
+vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+    int r = heights.size(), c = heights[0].size();
+    vector<vector<int>> vec(r, vector<int>(c, 0));
+    vector<vector<int>> ans;
+    queue<pair<int, int>> q;
+
+    int dx[] = { 0, 0, 1, -1 };
+    int dy[] = { 1, -1, 0, 0 };
+
+    // for pacific ocean represent 1
+    for (int i = 0; i < r; i++)
+        q.push({ i, 0 });
+
+    for (int i = 0; i < c; i++)
+        q.push({ 0, i });
+
+    while (!q.empty()) {
+        int x = q.front().first, y = q.front().second;
+        q.pop();
+        vec[x][y] = 1;
+
+        for (int i = 0; i < 4; i++) {
+            int xx = x + dx[i], yy = y + dy[i];
+
+            if (xx >= 0 && xx < r && yy >= 0 && yy < c
+                && !vec[xx][yy] && heights[x][y] <= heights[xx][yy])
+                q.push({ xx, yy });
+        }
+    }
+
+    for (int i = 0; i < r; i++)
+        q.push({ i, c - 1 });
+    for (int i = 0; i < c; i++)
+        q.push({ r - 1, i });
+
+    while (!q.empty())
+    {
+        int x = q.front().first, y = q.front().second;
+        q.pop();
+        if (vec[x][y] == 1)
+            ans.push_back({ x, y });
+        vec[x][y] = 2;
+
+        for (int i = 0; i < 4; i++) {
+            int xx = x + dx[i], yy = y + dy[i];
+
+            if (xx >= 0 && xx < r && yy >= 0 && yy < c
+                && vec[xx][yy] != 2 && heights[x][y] <= heights[xx][yy])
+                q.push({ xx, yy });
+        }
+    }
+
+    return ans;
+}
+
+// 1306
+unordered_set<int> visCanReach;
+bool canReach(vector<int>& arr, int start) {
+    if (start >= arr.size() || start < 0) return false;
+    else if (arr[start] == 0) return true;
+    else if (visCanReach.count(start)) return false;
+    visCanReach.insert(start);
+
+    return canReach(arr, start + arr[start]) || canReach(arr, start - arr[start]);
+}
+
+// 2875
+int binarySearchMinSizeSubArray(vector<int>& nums, int target) {
+    int left = 0, right = nums.size() - 1;
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (nums[mid] >= target)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left;
+}
+
+int minSizeSubarray(vector<int>& nums, int target) {
+    sort(nums.begin(), nums.end());
+
+    int cnt = 0;
+
+    while (target > 0) {
+        int findIdx = binarySearchMinSizeSubArray(nums, target);
+        if (nums[findIdx] > target)
+            return -1;
+
+        cnt += (target / nums[findIdx]);
+        target %= nums[findIdx];
+    }
+
+    return target == 0 ? cnt : -1;
+}
+
+// 2874
+long long maximumTripletValue(vector<int>& nums) {
+    int sz = nums.size();
+    vector<int> pre_max(sz, 0), suf_max(sz, 0);
+
+    pre_max[0] = nums[0];
+    for (int i = 1; i < sz; i++)
+        pre_max[i] = max(pre_max[i - 1], nums[i]);
+
+    suf_max[sz - 1] = nums[sz - 1];
+    for (int i = sz - 2; i >= 0; i--)
+        suf_max[i] = max(suf_max[i + 1], nums[i]);
+
+    long long res = 0;
+    for (int j = 1; j < sz - 1; j++) {
+        res = max(res, ((pre_max[j - 1] - nums[j]) * 1LL * suf_max[j + 1]));
+    }
+
+    return res;
+}
+
+// 2895
+int minProcessingTime(vector<int>& processorTime, vector<int>& tasks) {
+    sort(processorTime.begin(), processorTime.end());
+    sort(tasks.begin(), tasks.end(), greater<int>());
+
+    int max_time = 0;
+    for (int i = 0; i < processorTime.size(); i++) {
+        max_time = max(processorTime[i] + tasks[i * 4], max_time);
+    }
+    return max_time;
+}
+
+// 2894
+int differenceOfSums(int n, int m) {
+    int k = n / m;
+    int num2 = ((k * (1 + k)) / 2) * m;
+    int tot_sum = (n * (n + 1)) / 2;
+    int num1 = tot_sum - num2;
+    return num1 - num2;
+}
+
+int differenceOfSums_BruteForce(int n, int m) {
+    int total_sum = (n * (n + 1)) / 2, num1 = 0, num2 = 0;
+
+    for (int i = m; i <= n; i += m)
+        num2 += i;
+    num1 = total_sum - num2;
+    return num1 - num2;
+}
+
+TreeNode* prevNode = new TreeNode(INT_MIN);
+TreeNode* firstNode = NULL;
+TreeNode* secNode = NULL;
+TreeNode* lastNode = NULL;
+
+void SwapNodeVal(TreeNode* node1, TreeNode* node2) {
+    if (!node1 || !node2) {
+        cout << "dhukse" << endl;
+        return;
+    }
+
+    int temp = node1->val;
+    node1->val = node2->val;
+    node2->val = temp;
+}
+
+// 2811
+bool isSpliArray = false;
+bool recurCanSplitArray(vector<int>& nums, vector<vector<int>>& dp, int start, int end, int sum, int m) {
+    if (isSpliArray)
+        return true;
+
+    if (dp[start][end - 1] != -1)
+        return dp[start][end] == 1 ? true : false;
+
+    if (sum < m) {
+        dp[start][end - 1] = 0;
+        return false;
+    }
+
+    if (end - start <= 2) {
+        isSpliArray = true;
+        dp[start][end - 1] = 1;
+        return true;
+    }
+    bool left = recurCanSplitArray(nums, dp, start + 1, end, sum - nums[start], m);
+    bool right = recurCanSplitArray(nums, dp, start, end - 1, sum - nums[end - 1], m);
+
+    if (left || right)
+        dp[start][end - 1] = 1;
+    else
+        dp[start][end - 1] = 0;
+
+    return dp[start][end - 1];
+}
+
+
+bool canSplitArray(vector<int>& nums, int m) {
+    int sz = nums.size();
+    if (sz <= 2)
+        return true;
+    int sum = accumulate(nums.begin(), nums.end(), 0);
+
+    if (sum < m)
+        return false;
+
+    vector<vector<int>> dp(sz, vector<int>(sz, -1));
+    return recurCanSplitArray(nums, dp, 0, sz, sum, m);
+}
+
+
+// 2685
+// by disjoint set union
+int findParent_CountCompleteComponents(int x, vector<int>& parent) {
+    if (x == parent[x])
+        return x;
+    return parent[x] = findParent_CountCompleteComponents(parent[x], parent);
+}
+
+void union_CountCompleteComponents(int u, int v, vector<int>& size, vector<int>& parent) {
+    if (size[u] < size[v]) {
+        parent[u] = v;
+        size[v] += size[u];
+    }
+    else {
+        parent[v] = u;
+        size[u] += size[v];
+    }
+}
+
+int countCompleteComponents(int n, vector<vector<int>>& edges) {
+    vector<int> parent(n), size(n, 1);
+    for (int i = 0; i < n; i++)
+        parent[i] = i;
+
+    for (auto edge : edges) {
+        int u = edge[0], v = edge[1];
+        int u1 = findParent_CountCompleteComponents(u, parent);
+        int v1 = findParent_CountCompleteComponents(v, parent);
+
+        if (u1 != v1)
+            union_CountCompleteComponents(u1, v1, size, parent);
+    }
+
+    int z = 0;
+    for (int i = 0; i < n; i++) {
+        if (parent[i] == i) {
+            int z1 = size[i];
+        }
+    }
+
+    return 0;
+}
+
+void dfsCountCompleteComponents(vector<vector<int>>& graph, int cur, vector<int>& vis, int& node, int& edge) {
+    if (vis[cur]) return;
+
+    vis[cur] = 1;
+    node++;
+    edge += graph[cur].size();
+
+    for (auto neigh : graph[cur]) {
+        if (vis[neigh]) continue;
+
+        dfsCountCompleteComponents(graph, neigh, vis, node, edge);
+    }
+}
+
+int countCompleteComponents4(int n, vector<vector<int>>& edges) {
+    vector<vector<int>> adj(n);
+    vector<int> vis(n, 0);
+
+    for (auto edge : edges) {
+        adj[edge[0]].push_back(edge[1]);
+        adj[edge[1]].push_back(edge[0]);
+    }
+
+    queue<int> q;
+    int cnt = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (vis[i])
+            continue;
+        int node = 0, edge = 0;
+        dfsCountCompleteComponents(adj, i, vis, node, edge);
+        cnt += node * (node - 1) == edge;
+    }
+
+    return cnt;
+}
+
+
+int countCompleteComponents1(int n, vector<vector<int>>& edges) {
+    vector<vector<int>> adj(n);
+    vector<int> vis(n, 0);
+
+    for (auto edge : edges) {
+        adj[edge[0]].push_back(edge[1]);
+        adj[edge[1]].push_back(edge[0]);
+    }
+
+    queue<int> q;
+    int cnt = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (!vis[i]) {
+            q.push(i);
+            vis[i] = 1;
+            int con_nodes = adj[i].size();
+            bool is_connected = true;
+            int num_of_nodes = 0;
+
+            while (!q.empty())
+            {
+                int cur = q.front(); q.pop();
+                num_of_nodes++;
+
+                if (is_connected && adj[cur].size() != con_nodes)
+                    is_connected = false;
+
+                for (auto nei : adj[cur]) {
+                    if (!vis[nei]) {
+                        q.push(nei);
+                        vis[nei] = 1;
+                    }
+                }
+            }
+            if (num_of_nodes - 1 == con_nodes && is_connected)
+                cnt++;
+        }
+    }
+
+    return cnt;
+}
+
+// 94
+vector<int> inorderTraversal(TreeNode* root) {
+    // by morris traversal
+    TreeNode* cur = root;
+    vector<int> ans;
+    while (cur) {
+        if (!cur->left) {
+            ans.push_back(cur->val);
+            cur = cur->right;
+        }
+        else {
+            TreeNode* predeccessor = cur->left;
+            while (predeccessor->right != cur && predeccessor->right != NULL)
+                predeccessor = predeccessor->right;
+
+            if (predeccessor->right == cur) {
+                predeccessor->right = NULL;
+                ans.push_back(cur->val);
+                cur = cur->right;
+            }
+            else {
+                predeccessor->right = cur;
+                cur = cur->left;
+            }
+        }
+    }
+
+    return ans;
+}
+
+void recoverTreeInOrder(TreeNode* root) {
+    if (!root) return;
+    recoverTreeInOrder(root->left);
+
+    cout << "val: " << endl;
+
+    if (firstNode == NULL && prevNode && prevNode->val > root->val) {
+        firstNode = prevNode;
+        secNode = root;
+    }
+    else if (firstNode && prevNode->val > root->val)
+        secNode = root;
+
+    prevNode = root;
+    recoverTreeInOrder(root->right);
+}
+
+void recoverTree(TreeNode* root) {
+    if (!root) return;
+    recoverTreeInOrder(root);
+
+    if (!secNode)
+        secNode = prevNode;
+
+    SwapNodeVal(firstNode, secNode);
+}
+
+// 1381
+class CustomStack {
+    vector<int> vec;
+    int top = -1, sz = 0;
+public:
+    CustomStack(int maxSize) : vec(maxSize, -1) {
+        sz = maxSize;
+    }
+
+    void push(int x) {
+        if (top >= sz - 1)
+            return;
+
+        vec[++top] = x;
+    }
+
+    int pop() {
+        if (top < 0)
+            return -1;
+        return vec[top--];
+    }
+
+    void increment(int k, int val) {
+        for (int i = 0; i < min(k, sz); i++) {
+            vec[i] += val;
+        }
+    }
+};
+
+void merge(int arr[], int l, int mid, int r) {
+    int n1 = mid - l + 1;
+    int n2 = r - mid;
+
+    int left[10], right[10];
+
+    for (int i = 0; i < n1; i++)
+        left[i] = arr[l + i];
+    for (int j = 0; j < n2; j++)
+        right[j] = arr[mid + j + 1];
+
+    int i, j, k;
+    i = 0;
+    j = 0;
+    k = l;
+
+    while (i < n1 && j < n2)
+    {
+        if (left[i] <= right[j])
+            arr[k++] = left[i++];
+        else
+            arr[k++] = right[j++];
+    }
+
+    while (i < n1)
+        arr[k++] = left[i++];
+    while (j < n2)
+        arr[k++] = right[j++];
+}
+
+void mergeSort(int arr[], int l, int r) {
+    if (l >= r)
+        return;
+
+    int mid = l + (r - l) / 2;
+    mergeSort(arr, l, mid);
+    mergeSort(arr, mid + 1, r);
+
+    merge(arr, l, mid, r);
+}
+
+// 2391
+int garbageCollection(vector<string>& garbage, vector<int>& travel) {
+    int m = 0, g = 0, p = 0;
+
+    for (int i = garbage.size() - 1; i >= 0; i--) {
+        for (auto c : garbage[i]) {
+            switch (c)
+            {
+            case 'M':
+                m++;
+                break;
+            case 'P':
+                p++;
+                break;
+            case 'G':
+                g++;
+                break;
+            }
+        }
+
+        m += m > 0 ? travel[i - 1] : 0;
+        p += p > 0 ? travel[i - 1] : 0;
+        g += g > 0 ? travel[i - 1] : 0;
+    }
+
+    return m + p + g;
+}
+
+// 24                          1 3 4            2 3 4   
+ListNode* swapTwoNodes(ListNode* node1, ListNode* node2) {
+    node1->next = node1->next->next;
+    node2->next = node1;
+    return node2;
+}
+
+ListNode* swapPairs(ListNode* head) {
+    ListNode* newHead = new ListNode(0);
+    newHead->next = head;
+
+    ListNode* cur = newHead;
+
+    while (cur && cur->next)
+    {
+        cur->next = swapTwoNodes(cur->next, cur->next->next);
+        cur = cur->next->next;
+    }
+
+
+    return newHead->next;
+}
+
+ListNode* swapPairs2(ListNode* head) {
+    ListNode* newHead = new ListNode(0);
+    newHead->next = head;
+
+    ListNode* cur = newHead;
+
+    while (cur && cur->next)
+    {
+        // 0 -> 1 -> 2 -> 3 -> 4
+        // 0 2 3 4             1 3 4
+        auto temp = cur->next; // 1
+
+        cur->next = cur->next->next;
+        temp->next = cur->next->next;
+        auto temp2 = cur->next;
+        temp2->next = temp;
+        cur->next = temp2;
+        cur = cur->next->next;
+    }
+
+
+    return newHead->next;
+}
+
+// 2808
+int minimumSeconds(vector<int>& nums) {
+    unordered_map<int, vector<int>> mp;
+
+    for (int i = 0; i < nums.size(); i++) {
+        mp[nums[i]].push_back(i);
+    }
+
+    int n = nums.size() - 1;
+    int mn = INT32_MAX;
+    for (auto kvp : mp) {
+        int sz = kvp.second.size() - 1;
+        int mx_cnt = ((kvp.second[0] - 0) + (n - kvp.second[sz]) + 1) / 2;
+        for (int i = 1; i <= sz; i++) {
+            int cnt = ((kvp.second[i] - kvp.second[i - 1]) / 2);
+            mx_cnt = max(mx_cnt, cnt);
+        }
+        mn = min(mx_cnt, mn);
+    }
+
+    return mn;
+}
+
+ListNode* insertGreatestCommonDivisors(ListNode* head) {
+    ListNode* cur = head;
+    ListNode* temp = NULL;
+
+    while (cur && cur->next) {
+        int gcd_val = gcd(cur->val, cur->next->val);
+        temp = cur->next;
+        ListNode* node = new ListNode(gcd_val);
+
+        node->next = temp;
+        cur->next = node;
+        cur = cur->next->next;
+    }
+
+    return head;
+}
+
+int accountBalanceAfterPurchase(int purchaseAmount) {
+    double r = round((double)purchaseAmount / 10);
+    cout << r << endl;
+    int rnd = round(r);
+    rnd *= 10;
+
+    return 100 - rnd;
+}
+
+// 1769
+vector<int> minOperations(string boxes) {
+    int n = boxes.size();
+
+    vector<int> pre(n, 0), post(n, 0);
+    int oneCnt = 0;
+
+    for (int i = 1; i < n; i++) {
+        if (boxes[i - 1] == '1')
+            ++oneCnt;
+
+        pre[i] = pre[i - 1] + oneCnt;
+    }
+
+    oneCnt = 0;
+    for (int i = n - 2; i >= 0; i--) {
+        if (boxes[i + 1] == '1')
+            ++oneCnt;
+
+        post[i] = post[i + 1] + oneCnt;
+    }
+
+    vector<int> ans(n, 0);
+
+    for (int i = 0; i < n; i++) {
+        ans[i] = pre[i] + post[i];
+    }
+
+    return ans;
+}
 
 // 206
 ListNode* recursive_reverseList(ListNode* head, ListNode* newHead) {
@@ -6020,7 +7509,7 @@ int shipWithinDays(vector<int>& weights, int days) {
 // ideal binary search
 int searchInsert(vector<int>& nums, int target) {
 
-    int lo = 0, hi = nums.size();
+    int lo = 0, hi = nums.size()-1;
 
     while (lo < hi) {
         int mid = lo + (hi - lo) / 2;
@@ -7526,6 +9015,8 @@ int minStoneSum(vector<int>& piles, int k) {
 * sort(begin(tasks), end(tasks), [](const auto &t1, const auto &t2){
         return t1[1] < t2[1];
     });
+
+    return *max_element(dp.begin(), dp.end());
 */
 
 #endif 

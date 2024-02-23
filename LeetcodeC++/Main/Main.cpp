@@ -75,7 +75,7 @@ void visualizeMatrix(vector<vector<int>>& grid) {
 int main()
 {
     std::cout << "Hello World!\n";
-    vector<int> vect1{ 2, 2, 1 };
+    vector<int> vect1{ 2, 2, 3, 3 };
     vector<char> chvect{ 'A','A','A','B','B','B', 'C','C','C', 'D', 'D', 'E' };
     //int a = Solution::maximumTop(vect, 5);
 
@@ -93,8 +93,8 @@ int main()
         {"John","johnnybravo@mail.com"}
     };
 
-    string vect2dStr = "[0,1],[0,2]";
-    string vect2dStr1 = "[[5,5],[5,0],[4,4],[0,3],[1,0]]";
+    string vect2dStr = "[[1,2,2],[1,1,0],[0,1,1]]";
+    string vect2dStr1 = "[[0,1],[1,2],[2,3],[2,4]]";
     vector<vector<int>> vect2d = parseStringToMatrix(vect2dStr);
     vector<vector<int>> vect2d1 = parseStringToMatrix(vect2dStr1);
     // visualizeMatrix(vect2d);
@@ -119,7 +119,7 @@ int main()
     
     TreeNode* c = buildManualTree();
 
-    ListNode* al = buildListNode({1,2,3,4,5});
+    ListNode* al = buildListNode({ 5,2,13,3,8 });
     ListNode* bl = buildListNode({2,4,6});
     ListNode* cl = buildListNode({2,6});
 
@@ -128,7 +128,7 @@ int main()
     int arr[] = { 5,2,3,1,6,7,2 };
     // recoverTree(c);
 
-    auto res = canSplitArray(vect1, 4);
+    auto res = minimumMoves(vect2d);
 
     //cout << b << endl;
 }
