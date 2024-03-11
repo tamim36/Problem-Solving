@@ -29,11 +29,15 @@ trace       -1   0   1   0   3   4 -1  6*/
 // https://leetcode.com/problems/permutations/discuss/1257633/Backtracking-Solution-oror-C%2B%2B-oror-Easy-To-Understand-oror-With-explanation
 // https://leetcode.com/tag/backtracking/discuss/3055778/How-to-calculate-runtime-of-backtracking-algorithm-in-interview
 
+// 1156
+int maxRepOpt1(string text) {
+    unordered_map<int, int> ump;
 
+    for (int i = 0, j = 0; i < text.size(); i++) {
 
+    }
 
-
-
-
+    return 0;
+}
 
 #endif 

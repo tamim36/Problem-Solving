@@ -7,12 +7,9 @@
 //#include "SortingAlgorithms.h"
 
 TreeNode* buildManualTree() {
-    TreeNode* tree = new TreeNode(5);
-    tree->left = new TreeNode(3);
-    tree->right = new TreeNode(9);
+    TreeNode* tree = new TreeNode(-1);
+    tree->right = new TreeNode(-1);
 
-    tree->left->left = new TreeNode(-2147483648);
-    tree->left->right = new TreeNode(2);
 
     //tree->right->left = new TreeNode(6);
     //tree->right->right = new TreeNode(7);
@@ -21,6 +18,47 @@ TreeNode* buildManualTree() {
     //tree->right->left->right = new TreeNode(135);
 
     return tree;
+}
+
+
+vector<string> parseInputString(const string& input) {
+    // Remove leading '[' and trailing ']' characters
+    string data = input.substr(1, input.size() - 2);
+
+    // Tokenize the string based on ','
+    stringstream ss(data);
+    vector<string> tokens;
+    string token;
+    while (std::getline(ss, token, ',')) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
+TreeNode* buildAutomatedTree(string input) {
+    auto nodes = parseInputString(input);
+
+    if (nodes.empty())
+        return NULL;
+    queue<TreeNode*> q;
+    TreeNode* root = new TreeNode(stoi(nodes[0]));
+    q.push(root);
+
+    for (int i = 1; i < nodes.size() - 1; i+=2) {
+        TreeNode* node = q.front(); q.pop();
+
+        if (nodes[i] != "null") {
+            node->left = new TreeNode(stoi(nodes[i]));
+            q.push(node->left);
+        }
+        if (i+1 < nodes.size() && nodes[i + 1] != "null") {
+            node->right = new TreeNode(stoi(nodes[i + 1]));
+            q.push(node->right);
+        }
+    }
+
+    return root;
 }
 
 ListNode* buildListNode(vector<int> vec) {
@@ -75,14 +113,16 @@ void visualizeMatrix(vector<vector<int>>& grid) {
 int main()
 {
     std::cout << "Hello World!\n";
-    vector<int> vect1{ 2, 2, 3, 3 };
+    vector<int> vect1{ 2, 2, 3, 7 };
     vector<char> chvect{ 'A','A','A','B','B','B', 'C','C','C', 'D', 'D', 'E' };
     //int a = Solution::maximumTop(vect, 5);
 
     // Binary Tree Generate
     //struct TreeNode* root = new TreeNode(5);
 
-    vector<int> vect2 = { 8,4,10,9,11,2,5,1,6,3,7 };
+    vector<int> vect2 = { 4,1,6,0,2,5 };
+
+    auto trea = buildAutomatedTree("[4,1,6,0,2,5,7,null,null,null,3,null,null,null,8]");
     vector<string> vs = { "a==b","b!=a", "c==d", "d==e"};
     vector<string> vs1 = { "04:01","06:44" };
 
@@ -126,9 +166,11 @@ int main()
     vector<ListNode*> vln = { al, bl, cl };
 
     int arr[] = { 5,2,3,1,6,7,2 };
-    // recoverTree(c);
 
-    auto res = minimumMoves(vect2d);
+    //auto res = combinationSum(vect1, 7);
+
+    // findelements* obj = new findelements(c);
+    // auto ans1 = obj->find(1);
 
     //cout << b << endl;
 }

@@ -168,6 +168,217 @@ struct pair_hash {
     auto [r, c] = q.front();
 
 */
+
+
+
+// relisource interview question
+void fill2d() {
+    /*
+        1  2  3  4  5
+        14 15 16 17 6
+        13 20 19 18 7
+        12 11 10 9  8
+    */
+
+    // assuming ara is blank filled with 0
+    vector<vector<int>> ara(4, vector<int>(5, 0));
+    int len = ara.size(), height = ara[0].size();
+
+    queue<pair<int, int>> q;
+    q.push({ 0, 0 });
+    queue<pair<int, int>> q_direction;
+
+    q_direction.push({ 0, 1 });
+    q_direction.push({ 1, 0 });
+    q_direction.push({ 0, -1 });
+    q_direction.push({ -1, 0 });
+
+    int cur_val = 1;
+
+    while (cur_val <= len * height) {
+        int cur_position_x = q.front().first;
+        int cur_position_y = q.front().second;
+        q.pop();
+
+        // changing direction
+        if (cur_position_x >= len || cur_position_y >= height || cur_position_x < 0 || cur_position_y < 0
+            || ara[cur_position_x][cur_position_y] != 0) {
+            pair<int, int> cur_direction = q_direction.front();
+            q_direction.pop();
+            q_direction.push(cur_direction);
+
+            // update cur position
+            cur_position_x -= cur_direction.first;
+            cur_position_y -= cur_direction.second;
+        }
+        else {
+            ara[cur_position_x][cur_position_y] = cur_val;
+            cur_val++;
+        }
+
+
+        // pushing next index
+        int cur_dir_x = q_direction.front().first;
+        int cur_dir_y = q_direction.front().second;
+        q.push({ cur_position_x + cur_dir_x, cur_position_y + cur_dir_y });
+    }
+}
+
+
+
+// 1261
+class FindElements {
+private:
+    unordered_set<int> values;
+    void recoverTree(TreeNode* root) {
+        if (!root) return;
+
+        if (root->val == -1) root->val = 0;
+
+        values.insert(root->val);
+
+        if (root->left) root->left->val = (root->val * 2) + 1;
+        if (root->right) root->right->val = (root->val * 2) + 2;
+
+        recoverTree(root->left);
+        recoverTree(root->right);
+    }
+
+public:
+    FindElements(TreeNode* root) {
+        recoverTree(root);
+    }
+
+    bool find(int target) {
+        return values.count(target);
+    }
+};
+
+// 1038 538
+int value_to_bstToGst = 0;
+TreeNode* bstToGst(TreeNode* root) {
+    if (!root)
+        return root;
+
+    bstToGst(root->right);
+    value_to_bstToGst += root->val;
+    root->val = value_to_bstToGst;
+    bstToGst(root->left);
+
+    return root;
+}
+
+// 39
+void recur_combinationSum(int curSum, int curIdx, vector<int>& candidates, int target, vector<int>& sofar, vector<vector<int>>& ans) {
+    if (curSum >= target) {
+        if (curSum == target)
+            ans.push_back(sofar);
+
+        return;
+    }
+
+    for (int i = curIdx; i < candidates.size(); i++) {
+        curSum += candidates[i];
+        sofar.push_back(candidates[i]);
+
+        recur_combinationSum(curSum, i, candidates, target, sofar, ans);
+
+        sofar.pop_back();
+        curSum -= candidates[i];
+    }
+}
+
+vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+    vector<int> sofar;
+    vector<vector<int>> ans;
+
+    recur_combinationSum(0, 0, candidates, target, sofar, ans);
+
+    return ans;
+}
+
+// 77
+void recur_combine(int n, int k, int cur, vector<int>& sofar, vector<vector<int>>& ans) {
+    if (sofar.size() == k) {
+        ans.push_back(sofar);
+        return;
+    }
+
+    for (int i = cur; i <= n; i++) {
+        sofar.push_back(i);
+
+        recur_combine(n, k, i + 1, sofar, ans);
+
+        sofar.pop_back();
+    }
+}
+
+vector<vector<int>> combine(int n, int k) {
+    vector<int> sofar;
+    vector<vector<int>> ans;
+
+    recur_combine(n, k, 1, sofar, ans);
+    return ans;
+}
+
+// 49
+vector<vector<string>> groupAnagrams(vector<string>& strs) {
+    unordered_map<string, vector<string>> mp;
+
+    for (auto str : strs) {
+        string key = str;
+        sort(key.begin(), key.end());
+
+        mp[key].push_back(str);
+    }
+
+    vector<vector<string>> ans;
+    for (auto kvp : mp) {
+        ans.push_back(kvp.second);
+    }
+
+    return ans;
+}
+
+int minimumMoves(vector<vector<int>>& grid) {
+    // Base Case
+    int t = 0;
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            if (grid[i][j] == 0)
+                t++;
+    if (t == 0)
+        return 0;
+
+    int ans = INT_MAX;
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            if (grid[i][j] == 0)
+            {
+                for (int ni = 0; ni < 3; ++ni)
+                {
+                    for (int nj = 0; nj < 3; ++nj)
+                    {
+                        int d = abs(ni - i) + abs(nj - j);
+                        if (grid[ni][nj] > 1)
+                        {
+                            grid[ni][nj]--;
+                            grid[i][j]++;
+                            ans = min(ans, d + minimumMoves(grid));
+                            grid[ni][nj]++;
+                            grid[i][j]--;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ans;
+}
+
+
 string arrayToString(vector<int>& arr) {
     string arr_str = "";
     for (auto val : arr) {

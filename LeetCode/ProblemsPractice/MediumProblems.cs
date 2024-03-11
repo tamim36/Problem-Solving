@@ -1,12 +1,141 @@
-﻿using System;
+﻿using ProblemsPractice.BST;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 
 namespace ProblemsPractice
 {
     public class MediumProblems
     {
+
+        // 1038 538
+        public int rec_ConvertBST(TreeNode root, int val)
+        {
+            if (root == null) return 0;
+
+            int rVal = rec_ConvertBST(root.right, val);
+            val = rVal == 0 ? val : rVal;
+            val += root.val;
+            root.val = val;
+            int lVal = rec_ConvertBST(root.left, val);
+            val = lVal == 0 ? val : lVal;
+
+            return val;
+        }
+
+        public TreeNode ConvertBST(TreeNode root)
+        {
+            rec_ConvertBST(root, 0);
+            return root;
+        }
+
+        // 77
+        public IList<IList<int>> Combine(int n, int k)
+        {
+            IList<IList<int>> ans = new List<IList<int>>();
+            IList<int> sofar = new List<int>();
+
+            recur_combine(n, k, 1, sofar, ans);
+            return ans;
+        }
+
+        public void recur_combine(int n, int k, int cur, IList<int> sofar, IList<IList<int>> ans)
+        {
+            if (sofar.Count == k)
+            {
+                ans.Add(new List<int>(sofar));
+                return;
+            }
+
+            for (int i = cur; i <= n; i++)
+            {
+                sofar.Add(i);
+
+                recur_combine(n, k, i + 1, sofar, ans);
+
+                if (sofar.Any())
+                    sofar.RemoveAt(sofar.Count - 1);
+            }
+        }
+
+        // 2850
+        public int MinimumMoves(int[][] grid)
+        {
+            int[] starter = new int[9];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    starter[i*3 +j] = grid[i][j];
+                }
+            }
+
+            var target = new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1};
+            Queue<int[]> q = new Queue<int[]>();
+            ISet<string> visited = new HashSet<string>();
+
+            q.Enqueue(starter);
+            visited.Add(ArrayToString(starter));
+
+            int moves = 0;
+            while (q.Any())
+            {
+                int sz = q.Count;
+                for (int i = 0; i < sz; i++)
+                {
+                    int[] cur = q.Dequeue();
+                    if (cur.SequenceEqual(target))
+                        return moves;
+
+                    for (int j = 0; j < 9; j++)
+                    {
+                        if (cur[j] > 1)
+                        {
+                            foreach (var adj in getAdjacentsMimimumMoves(j))
+                            {
+                                int[] newState = (int[])cur.Clone();
+                                newState[j]--;
+                                newState[adj]++;
+
+                                string state = ArrayToString(newState);
+                                if (!visited.Contains(state))
+                                {
+                                    q.Enqueue(newState);
+                                    visited.Add(state);
+                                }
+                            }
+                        }
+                    }
+                }
+                moves++;
+            }
+
+
+            return moves;
+        }
+
+        public IList<int> getAdjacentsMimimumMoves(int index)
+        {
+            IList<int> adj = new List<int>();
+            if (index % 3 != 0) adj.Add(index - 1);
+            if (index % 3 != 2) adj.Add(index + 1);
+            if (index / 3 != 0) adj.Add(index - 3);
+            if (index / 3 != 2) adj.Add(index + 3);
+            return adj;
+        }
+
+        public string ArrayToString(int[] ara)
+        {
+            string res = "";
+            foreach (int num in ara)
+            {
+                res += num;
+            }
+            return res;
+        }
+
         // 47
         public IList<IList<int>> PermuteUnique(int[] nums)
         {

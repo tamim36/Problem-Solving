@@ -45,11 +45,9 @@ namespace ProblemsPractice
 
             var twoDimensionalJaggedArray = new int[][]
             {
-                new int[] {1,2,2,3,5},
-                new int[] {3,2,3,4,4},
-                new int[] {2,4,5,3,1},
-                new int[] { 6, 7, 1, 4, 5 },
-                new int[] { 5,1,1,2,4 },
+                new int[] {1,2,0},
+                new int[] {1,1,1},
+                new int[] {1,1,1}
             };
             string str = "1 box has 3 blue 4 red 6 green and 12 yellow marbles";
             string s2 = "p#######";
@@ -90,12 +88,12 @@ namespace ProblemsPractice
             bst.Remove(20);
             bst.print2DUtil(bst.Root, 0);*/
 
-            TreeNode root = new TreeNode(1);
+            TreeNode root = new TreeNode(3);
             root.left = new TreeNode(2);
-            root.right = new TreeNode(3);
-
-            root.left.right = new TreeNode(5);
-            root.right.right = new TreeNode(4);
+            root.right = new TreeNode(5);
+            root.left.left = new TreeNode(1);
+            //root.left.right = new TreeNode(5);
+            //root.right.right = new TreeNode(4);
 
             /*
             root.left.right.left = new TreeNode(5);
@@ -119,7 +117,7 @@ namespace ProblemsPractice
 
             var scls = new MediumProblems();
 
-            var a = scls.PermuteUnique(num1);
+            var a = scls.ConvertBST(root);
             
             //DesignProblemsCalling(new string[0], new int[0]);
         }
