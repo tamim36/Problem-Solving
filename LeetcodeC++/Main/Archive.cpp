@@ -9228,6 +9228,62 @@ int minStoneSum(vector<int>& piles, int k) {
     });
 
     return *max_element(dp.begin(), dp.end());
+
+
+
+    using compare function
+    static int countBits(int num) {
+        int count = 0;
+
+        while (num > 0) {
+            count++;
+            num &= (num - 1);  // Clear the least significant set bit.
+        }
+
+        return count;
+    }
+
+    static bool compare(int a, int b) {
+        int bitCountA = countBits(a);
+        int bitCountB = countBits(b);
+
+        if (bitCountA == bitCountB) {
+            return a < b;  // If set bit counts are equal, compare numerically.
+        }
+
+        return bitCountA < bitCountB;  // Sort by the set bit count in ascending order.
+    }
+
+    vector<int> sortByBits(vector<int>& arr) {
+        sort(arr.begin(), arr.end(), compare);
+        return arr;
+    }
+
+    // another example
+
+    static int count_setBits_ByFlipping(int n) {
+    int count = 0;
+    while (n) {
+        n = n & n - 1;
+        count++;
+    }
+
+    return count;
+}
+
+struct BitComparator {
+    bool operator()(int a1, int a2) const {
+        int bit1 = count_setBits_ByFlipping(a1);
+        int bit2 = count_setBits_ByFlipping(a2);
+        return bit1 == bit2 ? a1 < a2 : bit1 < bit2;
+    }
+};
+
+// 1356
+vector<int> sortByBits(vector<int>& arr) {
+    sort(begin(arr), end(arr), BitComparator());
+    return arr;
+}
 */
 
 #endif 

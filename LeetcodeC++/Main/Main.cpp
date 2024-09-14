@@ -113,16 +113,18 @@ void visualizeMatrix(vector<vector<int>>& grid) {
 int main()
 {
     std::cout << "Hello World!\n";
-    vector<int> vect1{ 2, 2, 3, 7 };
+    vector<int> vect1{ 1, 2, 3 };
+    vector<int> vect2 = { 10, 15, 40 };
     vector<char> chvect{ 'A','A','A','B','B','B', 'C','C','C', 'D', 'D', 'E' };
     //int a = Solution::maximumTop(vect, 5);
 
     // Binary Tree Generate
     //struct TreeNode* root = new TreeNode(5);
 
-    vector<int> vect2 = { 4,1,6,0,2,5 };
+    
 
-    auto trea = buildAutomatedTree("[4,1,6,0,2,5,7,null,null,null,3,null,null,null,8]");
+    auto trea = buildAutomatedTree("[1,2,3,4,5,null,null]");
+    auto trea2 = buildAutomatedTree("[7,3,15,null,null,9,20]");
     vector<string> vs = { "a==b","b!=a", "c==d", "d==e"};
     vector<string> vs1 = { "04:01","06:44" };
 
@@ -133,7 +135,7 @@ int main()
         {"John","johnnybravo@mail.com"}
     };
 
-    string vect2dStr = "[[1,2,2],[1,1,0],[0,1,1]]";
+    string vect2dStr = "[[1,4],[2,5],[1,3],[3,4]]";
     string vect2dStr1 = "[[0,1],[1,2],[2,3],[2,4]]";
     vector<vector<int>> vect2d = parseStringToMatrix(vect2dStr);
     vector<vector<int>> vect2d1 = parseStringToMatrix(vect2dStr1);
@@ -159,7 +161,7 @@ int main()
     
     TreeNode* c = buildManualTree();
 
-    ListNode* al = buildListNode({ 5,2,13,3,8 });
+    ListNode* al = buildListNode({ 3,0,2,6,8,1,7,9,4,2,5,5,0 });
     ListNode* bl = buildListNode({2,4,6});
     ListNode* cl = buildListNode({2,6});
 
@@ -167,10 +169,9 @@ int main()
 
     int arr[] = { 5,2,3,1,6,7,2 };
 
-    //auto res = combinationSum(vect1, 7);
+    auto res = knapSack(6, vect1, vect2, 3);
 
-    // findelements* obj = new findelements(c);
-    // auto ans1 = obj->find(1);
+    
 
     //cout << b << endl;
 }
