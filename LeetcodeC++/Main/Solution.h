@@ -55,6 +55,77 @@ int count_setBits_ByFlipping(int n) {
     return count;
 }
 
+// 1178
+/* sub   sub - 1    mask
+10110   10101       10110 //(sub-1)&mask = 10100, which shows in next row
+10100   10011       10110 //same...
+10010   10001       10110
+10000   01111       10110
+00110   00101       10110
+00100   00011       10110
+00010   00001       10110
+00000
+*/
+vector<int> findNumOfValidWords(vector<string>& words, vector<string>& puzzles) {
+    unordered_map<int, int> mp;
+    vector<int> ans;
+    
+    for (auto word : words) {
+        int mask = 0;
+        for (auto ch : word)
+            mask |= (1 << (ch - 'a'));
+
+        mp[mask]++;
+    }
+
+    for (auto puzzle : puzzles) {
+        int mask = 0;
+        for (auto ch : puzzle)
+            mask |= (1 << (ch - 'a'));
+
+        int submask = mask, count = 0;
+        int first = (1 << (puzzle[0] - 'a'));
+        while (submask) {
+            if (first & submask)
+                count += mp[submask];
+
+            submask = (submask - 1) & mask;
+        }
+
+        ans.push_back(count);
+    }
+
+    return ans;
+}
+
+// 1734
+// a0 = e0 ^ a1
+// a0 = tot_a ^ a1 ^ a2 ^ a3 ^ a4
+// a0 = tot_a ^ e1 ^ e3
+vector<int> decode(vector<int>& encoded) {
+    int sz = encoded.size();
+    vector<int> ans(sz + 1);
+    if (sz < 2)
+        return ans;
+
+    int tot_xor_a = 0;
+
+    for (int i = 0; i < sz; i++) {
+        tot_xor_a ^= i + 1;
+        if (i % 2)
+            tot_xor_a ^= encoded[i];
+    }
+
+    int ini_val = tot_xor_a ^ (sz + 1);
+    ans[0] = ini_val;
+
+    for (int i = 1; i < sz + 1; i++) {
+        ans[i] = ans[i - 1] ^ encoded[i - 1];
+    }
+
+    return ans;
+}
+
 // 260
 vector<int> singleNumberIII(vector<int>& nums) {
     int xor_two_num = 0;
@@ -84,10 +155,116 @@ vector<int> singleNumberIII(vector<int>& nums) {
 
 #pragma endregion
 
-
 #pragma region Dynamic Programming (DP)
 
 // Dynamic Programming
+// 
+//
+// https://www.geeksforgeeks.org/problems/minimum-sum-partition3317/1
+int GetSubset_minDifference(vector<int>& vec, int sum, int n) {
+    int target = sum / 2;
+    vector<vector<bool>> dp(n + 1, vector<bool>(target + 1, false));
+
+    for (int i = 0; i <= n; i++)
+        dp[i][0] = true;
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= target; j++) {
+            if (j - vec[i - 1] >= 0)
+                dp[i][j] = dp[i - 1][j] || dp[i - 1][j - vec[i - 1]];
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    int validHalfSum = 0;
+    for (int i = 0; i <= target; i++)
+        if (dp[n][i]) validHalfSum = i;
+
+    int ans = sum - 2 * validHalfSum;
+    return ans;
+}
+
+int minDifference(int arr[], int n) {
+    vector<int> vec(arr, arr + n);
+    int sum = accumulate(vec.begin(), vec.end(), 0);
+    return GetSubset_minDifference(vec, sum, n);
+}
+
+// 494
+int findTargetSumWays(vector<int>& nums, int target, int curSum, int n) {
+    if (target == curSum && n == 0) 
+        return 1;
+    if (n <= 0)
+        return 0;
+
+    return findTargetSumWays(nums, target, curSum - nums[n - 1], n - 1)
+        + findTargetSumWays(nums, target, curSum + nums[n - 1], n - 1);
+}
+
+int findTargetSumWays(vector<int>& nums, int target) {
+    return findTargetSumWays(nums, target, 0, nums.size());
+}
+// Count Subset of Given Sum
+int CountSubsetsGivenSum_Recursion(vector<int>& nums, int sum, int n) {
+    if (sum == 0)
+        return 1;
+    if (n <= 0 || sum < 0)
+        return 0;
+
+    return CountSubsetsGivenSum_Recursion(nums, sum, n - 1)
+        + CountSubsetsGivenSum_Recursion(nums, sum - nums[n - 1], n - 1);
+}
+
+int CountSubsetsGivenSum_DP(vector<int>& nums, int sum, int n, vector<vector<int>>& dp) {
+    if (sum == 0)
+        return 1;
+    if (n <= 0 || sum < 0)
+        return 0;
+    if (dp[n][sum] != -1)
+        return dp[n][sum];
+
+    if (sum - nums[n - 1] >= 0)
+        dp[n][sum] = CountSubsetsGivenSum_Recursion(nums, sum, n - 1)
+        + CountSubsetsGivenSum_Recursion(nums, sum - nums[n - 1], n - 1);
+    else
+        dp[n][sum] = CountSubsetsGivenSum_Recursion(nums, sum, n - 1);
+
+    return dp[n][sum];
+}
+
+int CountSubsetsGivenSum_Recursion(vector<int>& nums, int sum) {
+    vector<vector<int>> dp(nums.size() + 1, vector<int>(sum + 1, -1));
+    return CountSubsetsGivenSum_DP(nums, sum, nums.size(), dp);
+}
+
+int CountSubsetsGivenSum_TopDown(vector<int>& nums, int sum) {
+    int n = nums.size();
+    vector<vector<int>> dp(n + 1, vector<int>(sum + 1, 0));
+
+    for (int i = 0; i < n + 1; i++)
+        dp[i][0] = 1;
+
+    for (int i = 1; i < n + 1; i++) {
+        for (int j = 1; j < sum + 1; j++) {
+            if (j - nums[i - 1] >= 0)
+                dp[i][j] = dp[i - 1][j] + dp[i - 1][j - nums[i - 1]];
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    for (int i = 0; i < n + 1; i++) {
+        for (int j = 0; j < sum + 1; j++) {
+            cout << dp[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return dp[n][sum];
+}
+
+
 // https://leetcode.com/problems/partition-equal-subset-sum/
 // Equal Sum Partition
 bool canPartition(vector<int>& nums, int curSum, int targetSum, int n, vector<vector<int>>& dp) {
@@ -102,6 +279,30 @@ bool canPartition(vector<int>& nums, int curSum, int targetSum, int n, vector<ve
         || canPartition(nums, curSum, targetSum, n - 1, dp);
 
     return dp[n][curSum];
+}
+
+bool canPartition_TopDown(vector<int>& nums) {
+    int sum = accumulate(nums.begin(), nums.end(), 0);
+    if (sum % 2)
+        return false;
+    int n = nums.size();
+    int targetSum = sum / 2;
+    vector<vector<bool>> dp(n + 1, vector<bool>(targetSum + 1, false));
+    
+
+    for (int i = 0; i < n + 1; i++)
+        dp[i][0] = true;
+
+    for (int i = 1; i < n + 1; i++) {
+        for (int j = 1; j < targetSum + 1; j++) {
+            if (j - nums[i - 1] >= 0)
+                dp[i][j] = dp[i - 1][j - nums[i - 1]] || dp[i - 1][j];
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    return dp[n][targetSum];
 }
 
 
