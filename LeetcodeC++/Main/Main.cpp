@@ -113,7 +113,7 @@ void visualizeMatrix(vector<vector<int>>& grid) {
 int main()
 {
     std::cout << "Hello World!\n";
-    vector<int> vect1{ 1,1,1,1,1 };
+    vector<int> vect1{ 1,1,2,2,3,4,2,3 };
     vector<int> vect2 = { 10, 15, 40 };
     vector<char> chvect{ 'A','A','A','B','B','B', 'C','C','C', 'D', 'D', 'E' };
     //int a = Solution::maximumTop(vect, 5);
@@ -169,7 +169,7 @@ int main()
 
     int arr[] = { 5,2,3,1,6,7,2 };
 
-    auto res = findTargetSumWays(vect1, 3);
+    auto res = findXSum(vect1, 6, 2);
 
     
 

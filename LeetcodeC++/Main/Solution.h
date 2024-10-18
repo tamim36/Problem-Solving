@@ -158,8 +158,199 @@ vector<int> singleNumberIII(vector<int>& nums) {
 #pragma region Dynamic Programming (DP)
 
 // Dynamic Programming
-// 
-//
+
+// 322
+int coinChangeTopDown(vector<int>& coins, int amount) {
+    int n = coins.size();
+    vector<vector<int>> dp(n + 1, vector<int>(amount + 1, INT_MAX));
+
+    for (int i = 0; i <= n; i++)
+        dp[i][0] = 0;
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= amount; j++) {
+            if (j - coins[i - 1] >= 0 && dp[i][j - coins[i - 1]] != INT_MAX)
+                dp[i][j] = min(dp[i][j - coins[i - 1]] + 1, dp[i - 1][j]);
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    return dp[n][amount] == INT_MAX ? -1 : dp[n][amount];
+}
+
+int coinChangeBottomUp(vector<int>& coins, int idx, int amount, vector<vector<int>>& dp) {
+    if (amount == 0)
+        return 0;
+    if (idx <= 0)
+        return INT_MAX;
+    if (dp[idx][amount] != INT_MAX)
+        return dp[idx][amount];
+
+    if (amount - coins[idx - 1] >= 0) {
+        int withVal = coinChangeBottomUp(coins, idx, amount - coins[idx - 1], dp);
+        withVal = withVal == INT_MAX ? INT_MAX : withVal + 1;
+        int withoutVal = coinChangeBottomUp(coins, idx - 1, amount, dp);
+        return dp[idx][amount] = min(withVal, withoutVal);
+    }
+    else
+        return dp[idx][amount] = coinChangeBottomUp(coins, idx - 1, amount, dp);
+
+}
+
+int coinChange(vector<int>& coins, int amount) {
+    int n = coins.size();
+    vector<vector<int>> dp(n + 1, vector<int>(amount + 1, INT_MAX));
+    int ans = coinChangeBottomUp(coins, n, amount, dp);
+    return ans == INT_MAX ? -1 : ans;
+}
+
+// Coin Change (Count Ways)
+long long int countCoinChangeTopDown(vector<int>& v, int n, int sum) {
+    vector<vector<long long int>> dp(n + 1, vector<long long int>(sum + 1, 0));
+
+    for (int i = 0; i <= n; i++)
+        dp[i][0] = 1;
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= sum; j++) {
+            if (v[i] <= j)
+                dp[i][j] = dp[i][j - v[i - 1]] + dp[i - 1][j];
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    return dp[n][sum];
+}
+
+long long int countCoinChangeRecursion(vector<int>& v, int n, int sum) {
+    if (sum == 0)
+        return 1;
+    if (n <= 0)
+        return 0;
+
+    if (sum - v[n - 1] >= 0)
+        return countCoinChangeRecursion(v, n, sum - v[n - 1])
+        + countCoinChangeRecursion(v, n - 1, sum);
+    else
+        return countCoinChangeRecursion(v, n - 1, sum);
+}
+
+long long int countCoinChangeBottomUp(vector<int>& v, int n, int sum, vector<vector<long long int>>& dp) {
+    if (sum == 0)
+        return 1;
+    if (n <= 0)
+        return 0;
+    if (dp[n][sum] != -1)
+        return dp[n][sum];
+
+    if (sum - v[n - 1] >= 0)
+        dp[n][sum] = countCoinChangeBottomUp(v, n, sum - v[n - 1], dp)
+        + countCoinChangeBottomUp(v, n - 1, sum, dp);
+    else
+        dp[n][sum] = countCoinChangeBottomUp(v, n - 1, sum, dp);
+    
+    return dp[n][sum];
+}
+
+long long int countCoinChange(int coins[], int N, int sum) {
+    vector<int> vec(coins, coins + N);
+    vector<vector<long long int>> dp(N + 1, vector<long long int>(sum + 1, -1));
+
+    return countCoinChangeBottomUp(vec, N, sum, dp);
+}
+
+// 0/1 knapsack
+int knapSackRecursion(int W, int n, vector<int>& wt, vector<int>& val) {
+    if (n <= 0)
+        return 0;
+
+    if (wt[n - 1] <= W)
+        return max(val[n - 1] + knapSackRecursion(W - wt[n - 1], n - 1, wt, val),
+            knapSackRecursion(W, n - 1, wt, val));
+    else
+        return knapSackRecursion(W, n - 1, wt, val);
+}
+
+int knapSack(int W, vector<int>& wt, vector<int>& val) {
+    return knapSackRecursion(W, wt.size(), wt, val);
+}
+
+// https://www.geeksforgeeks.org/problems/rod-cutting0840/1?itm_source=geeksforgeeks&itm_medium=article&itm_campaign=practice_card
+// rod cutting - unbound knapsack
+int cutRodRecursion(vector<int>& p, int n, int len) {
+    if (n <= 0)
+        return 0;
+    if (n <= len)
+        return max(p[n - 1] + cutRodRecursion(p, n, len - n), cutRodRecursion(p, n - 1, len));
+    else
+        return cutRodRecursion(p, n - 1, len);
+}
+
+int cutRodDp(vector<int>& p, int n, int len, vector<vector<int>>& dp) {
+    if (n <= 0)
+        return 0;
+    if (dp[n][len] != -1)
+        return dp[n][len];
+
+    if (n <= len)
+        dp[n][len] = max(p[n - 1] + cutRodDp(p, n, len - n, dp), cutRodDp(p, n - 1, len, dp));
+    else
+        dp[n][len] = cutRodDp(p, n - 1, len, dp);
+    return dp[n][len];
+}
+// TODO: need to find issue
+int cutRodTopDown(vector<int>& p, int n) {
+    vector<vector<int>> dp(n + 1, vector<int>(n + 1, 0));
+    int len = n;
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= len; j++) {
+            if (j - i >= 0)
+                dp[i][j] = max(p[i - 1] + dp[i][j - i], dp[i - 1][j]);
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    return dp[n][len];
+}
+
+int cutRod(int price[], int n) {
+    vector<int> p(price, price + n);
+
+    return cutRodTopDown(p, n);
+}
+
+// https://www.geeksforgeeks.org/problems/partitions-with-given-difference/0
+int countPartitions_TopDown(int n, int target, vector<int>& arr) {
+    vector<vector<int>> dp(n + 1, vector<int>(target + 1, 0));
+
+    for (int i = 0; i <= n; i++)
+        dp[i][0] = 1;
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 0; j <= target; j++) {
+            if (j - arr[i - 1] >= 0) 
+                dp[i][j] = dp[i - 1][j] + dp[i - 1][j - arr[i - 1]];
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    return dp[n][target];
+}
+
+int countPartitions(int n, int d, vector<int>& arr) {
+    int total = accumulate(arr.begin(), arr.end(), 0);
+    if ((total + d) % 2)
+        return 0;
+    int target = (total + d) / 2;
+
+    return countPartitions_TopDown(n, target, arr);
+}
+ 
 // https://www.geeksforgeeks.org/problems/minimum-sum-partition3317/1
 int GetSubset_minDifference(vector<int>& vec, int sum, int n) {
     int target = sum / 2;
@@ -192,6 +383,33 @@ int minDifference(int arr[], int n) {
 }
 
 // 494
+
+int findTargetSumWays_TopDown(vector<int>& nums, int target) {
+    if (target < 0) target *= (-1);
+    int n = nums.size();
+    int sum = accumulate(nums.begin(), nums.end(), 0);
+
+    if ((target + sum) % 2)
+        return 0;
+
+    int t = (target + sum) / 2;
+    vector<vector<int>> dp(n + 1, vector<int>(t + 1, -1));
+
+    for (int i = 0; i < n; i++)
+        dp[i][0] = 1;
+
+    for (int i = 1; i < n; i++) {
+        for (int j = 0; j < t; j++) {
+            if (j - nums[i - 1] >= 0)
+                dp[i][j] = dp[i - 1][j] + dp[i - 1][j - nums[i - 1]];
+            else
+                dp[i][j] = dp[i - 1][j];
+        }
+    }
+
+    return dp[n][t];
+}
+
 int findTargetSumWays(vector<int>& nums, int target, int curSum, int n) {
     if (target == curSum && n == 0) 
         return 1;
@@ -467,6 +685,90 @@ int minCostClimbingStairs(vector<int>& cost) {
 #pragma endregion
 
 #pragma region Leetcode Contest
+
+// Weekly Contest 419
+int dfs_khLargestPerfectSubtree(TreeNode* root, vector<int>& values) {
+    if (!root)
+        return 0;
+
+    int right = dfs_khLargestPerfectSubtree(root->right, values);
+    int left = dfs_khLargestPerfectSubtree(root->left, values);
+
+    int count_nodes = 0;
+    if (right == left) {
+        count_nodes = (left + right) + 1;
+        values.push_back(count_nodes);
+    }
+
+    return count_nodes;
+}
+
+int kthLargestPerfectSubtree(TreeNode* root, int k) {
+    vector<int> values;
+
+    int val = dfs_khLargestPerfectSubtree(root, values);
+    sort(values.begin(), values.end(), greater<int>());
+    return k > values.size() ? -1 : values[k - 1];
+}
+
+vector<long long> findXSum(vector<int>& nums, int k, int x) {
+    unordered_map<int, int> freq;
+    vector<long long> ans;
+    set<pair<long long, int>, greater<pair<long long, int>>> top, bottom;
+    long long xsum = 0;
+
+    for (int i = 0; i < nums.size(); i++) {
+        long long cnt = freq[nums[i]];
+        if (cnt) {
+            if (auto it = bottom.find({ cnt, nums[i] }); it != end(bottom))
+                bottom.erase(it);
+            else {
+                top.erase({cnt, nums[i]});
+                xsum -= (cnt * nums[i]);
+            }
+        }
+
+        freq[nums[i]]++;
+        top.insert({ cnt + 1, nums[i] });
+        xsum += ((cnt + 1) * nums[i]);
+
+        if (top.size() > x) {
+            auto it_top = prev(end(top));
+            xsum -= (it_top->first * it_top->second);
+            bottom.insert({it_top->first, it_top->second});
+            top.erase(it_top);
+        }
+
+        if (i >= k) {
+            cnt = freq[nums[i - k]];
+            if (auto it = bottom.find({ cnt, nums[i-k] }); it != end(bottom))
+                bottom.erase(it);
+            else {
+                it = top.find({ cnt, nums[i - k] });
+                xsum -= (it->first * it->second);
+                top.erase(it);
+            }
+
+            if (cnt > 1)
+                bottom.insert({cnt - 1, nums[i-k]});
+
+            --freq[nums[i - k]];
+            if (top.size() < x) {
+                if (auto it = begin(bottom); it != end(bottom)) {
+                    xsum += (it->first * it->second);
+                    top.insert({it->first, it->second});
+                    bottom.erase(it);
+                }
+            }
+
+        }
+        
+        if (i + 1 >= k)
+            ans.push_back(xsum);
+    }
+
+    return ans;
+}
 
 // Biweekly Contest 129
 int cntArr = 0;
