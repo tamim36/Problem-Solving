@@ -9,6 +9,63 @@ namespace ProblemsPractice
 {
     public class MediumProblems
     {
+        int MaxPathSumVal = int.MinValue + 10000;
+
+        public int MaxPathSumRec(TreeNode root)
+        {
+            if (root == null)
+                return int.MinValue + 10000;
+            if (root.left == null && root.right == null)
+            {
+                MaxPathSumVal = Math.Max(MaxPathSumVal, root.val);
+                return root.val;
+            }
+
+            int l = MaxPathSumRec(root.left);
+            int r = MaxPathSumRec(root.right);
+            MaxPathSumVal = Math.Max(MaxPathSumVal, Math.Max(l, Math.Max(r, Math.Max(l + r + root.val, root.val))));
+
+            return root.val + Math.Max(l, r);
+        }
+
+        public int MaxPathSum(TreeNode root)
+        {
+            MaxPathSumRec(root);
+            return MaxPathSumVal;
+        }
+
+        public TreeNode InvertTree(TreeNode root)
+        {
+            if (root == null)
+                return root;
+
+            var temp = root.left;
+            root.left = root.right;
+            root.right = temp;
+            InvertTree(root.left);
+            InvertTree(root.right);
+            return root;
+        }
+
+        public bool IsSameTree(TreeNode p, TreeNode q)
+        {
+            if (p == null && q == null)
+                return true;
+            else if (p == null || q == null)
+                return false;
+            else if (p.val != q.val)
+                return false;
+            else
+                return IsSameTree(p.left, q.left) && IsSameTree(p.right, q.right);
+        }
+
+        public int MaxDepth(TreeNode root)
+        {
+            if (root == null)
+                return 0;
+
+            return Math.Max(1 + MaxDepth(root.left), 1 + MaxDepth(root.right));
+        }
 
         // 1038 538
         public int rec_ConvertBST(TreeNode root, int val)

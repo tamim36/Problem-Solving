@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef SOLUTION_H
 #define SOLUTION_H
 
@@ -158,6 +158,274 @@ vector<int> singleNumberIII(vector<int>& nums) {
 #pragma region Dynamic Programming (DP)
 
 // Dynamic Programming
+
+int LongestRepeatingSubsequence(string& s) {
+    int m = s.size();
+    vector<vector<int>> dp(m + 1, vector<int>(m + 1, 0));
+
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= m; j++) {
+            if (s[i - 1] == s[j - 1] && i != j)
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            else
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+        }
+    }
+
+    return dp[m][m];
+}
+
+// 1092
+string shortestCommonSupersequence(string str1, string str2) {
+    int m = str1.size(), n = str2.size();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (str1[i - 1] == str2[j - 1])
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+
+    string ans = "";
+    int i = m, j = n;
+    while (i > 0 && j > 0) {
+        if (dp[i][j] == 1 + dp[i - 1][j-1] && str1[i - 1] == str2[j - 1]) {
+            ans += str1[i];
+            i--, j--;
+        }
+        else if (dp[i - 1][j] > dp[i][j - 1]) {
+            ans += str1[i-1];
+            i--;
+        }
+        else {
+            ans += str2[j - 1];
+            j--;
+        }
+    }
+
+    while (i-- > 0)
+        ans += str1[i - 1];
+    while (j-- > 0)
+        ans += str2[j - 1];
+
+    reverse(ans.begin(), ans.end());
+    return ans;
+}
+
+// 516
+int minDistance(string word1, string word2) {
+    int m = word1.size(), n = word2.size();
+    return 0;
+}
+
+int longestPalindromeSubseq(string s) {
+    int m = s.size();
+    vector<vector<int>> dp(m + 1, vector<int>(m + 1, 0));
+
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= m; j++) {
+            if (s[i - 1] == s[m - j])
+                dp[i][j] = dp[i - 1][j - 1];
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+
+    return dp[m][m];
+}
+
+
+// https://www.naukri.com/code360/problems/longest-common-substring_1235207?utm_source=striver&utm_medium=website&utm_campaign=a_zcoursetuf
+int lcs(string str1, string str2, int n, int m, int len) {
+    if (n == 0 || m == 0)
+        return len;
+
+    if (str1[n - 1] == str2[m - 1])
+        len = lcs(str1, str2, n - 1, m - 1, len + 1);
+
+    int len1 = lcs(str1, str2, n - 1, m, 0);
+    int len2 = lcs(str1, str2, n, m - 1, 0);
+    len = max(len, max(len1, len2));
+    return len;
+}
+
+int maxLcxMemo = 0;
+int lcsMemo(string& s1, string& s2, int n, int m, vector<vector<int>>& dp) {
+    if (m == 0 || n == 0)
+        return 0;
+
+    if (s1[n - 1] == s2[m - 1])
+        dp[n][m] = 1 + lcsMemo(s1, s2, n - 1, m - 1, dp);
+    else
+        dp[n][m] = 0;
+
+    lcsMemo(s1, s2, n, m-1, dp);
+    lcsMemo(s1, s2, n-1, m, dp);
+
+    maxLcxMemo = max(maxLcxMemo, dp[n][m]);
+    return dp[n][m];
+}
+
+
+int lcSubstrDP(int n, int m, string& s1, string& s2, vector<vector<int>>& dp)
+{
+    if (n == 0 or m == 0)
+        return 0;
+    if (dp[n][m] != -1)
+        return dp[n][m];
+    if (s1[n - 1] == s2[m - 1])
+        dp[n][m] = 1 + lcSubstrDP(n - 1, m - 1, s1, s2, dp);
+    else
+        dp[n][m] = 0;
+    lcSubstrDP(n, m - 1, s1, s2, dp);
+    lcSubstrDP(n - 1, m, s1, s2, dp);
+    maxLcxMemo = max(maxLcxMemo, dp[n][m]);
+    return dp[n][m];
+}
+
+// Longest Common Substring - Top Down
+int lcs(string& str1, string& str2) {
+    int dp[1001][1001];
+    for (int i = 0; i < 1001; i++)
+        dp[i][0] = 0;
+    for (int i = 0; i < 1001; i++)
+        dp[0][i] = 0;
+
+    int maxLen = 0;
+    for (int i = 1; i <= str1.size(); i++) {
+        for (int j = 1; j <= str2.size(); j++) {
+            if (str1[i - 1] == str2[j - 1])
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            else
+                dp[i][j] = 0;
+
+            maxLen = max(dp[i][j], maxLen);
+        }
+    }
+
+    return maxLen;
+}
+
+// 1143
+int longestCommonSubsequence_Memo(string& text1, string& text2, int m, int n, int memo[][1001]) {
+    if (m == 0 || n == 0) {
+        return 0;
+    }
+    if (memo[m][n] != -1) {
+        return memo[m][n];
+    }
+    if (text1[m - 1] == text2[n - 1]) {
+        return memo[m][n] = 1 + longestCommonSubsequence_Memo(text1, text2, m - 1, n - 1, memo);
+    }
+    else {
+        return memo[m][n] = max(longestCommonSubsequence_Memo(text1, text2, m - 1, n, memo), longestCommonSubsequence_Memo(text1, text2, m, n - 1, memo));
+    }
+}
+
+int longestCommonSubsequence_2(string text1, string text2) {
+    int m = text1.size(), n = text2.size();
+    int memo[1001][1001];
+    for (int i = 0; i < 1001; i++) {
+        for (int j = 0; j < 1001; j++) {
+            memo[i][j] = -1;
+        }
+    }
+    return longestCommonSubsequence_Memo(text1, text2, m, n, memo);
+}
+
+int longestCommonSubsequence_Recursive(string text1, string text2, int n1, int n2) {
+    if (n1 == 0 || n2 == 0)
+        return 0;
+
+    if (text1[n1 - 1] == text2[n2 - 1])
+        return 1 + longestCommonSubsequence_Recursive(text1, text2, n1 - 1, n2 - 1);
+    else
+        return max(longestCommonSubsequence_Recursive(text1, text2, n1, n2 - 1),
+                    longestCommonSubsequence_Recursive(text1, text2, n1 - 1, n2));
+}
+
+int longestCommonSubsequence_Memoization(string text1, string text2, int n1, int n2, vector<vector<int>>& dp) {
+    if (n1 == 0 || n2 == 0)
+        return 0;
+
+    if (dp[n1][n2] != -1)
+        return dp[n1][n2];
+
+    if (text1[n1 - 1] == text2[n2 - 1])
+        dp[n1][n2] = 1 + longestCommonSubsequence_Memoization(text1, text2, n1 - 1, n2 - 1, dp);
+    else
+        dp[n1][n2] = max(longestCommonSubsequence_Memoization(text1, text2, n1, n2 - 1, dp),
+            longestCommonSubsequence_Memoization(text1, text2, n1 - 1, n2, dp));
+
+    return dp[n1][n2];
+}
+
+int longestCommonSubsequence_TopDown(string text1, string text2) {
+    int n1 = text1.size(), n2 = text2.size();
+    vector<vector<int>> dp(n1 + 1, vector<int>(n2 + 1, 0));
+
+    for (int i = 1; i <= n1; i++) {
+        for (int j = 1; j <= n2; j++) {
+            if (text1[i - 1] == text2[j - 1])
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+
+    return dp[n1][n2];
+}
+
+
+int longestCommonSubsequence(string text1, string text2) {
+    return longestCommonSubsequence_TopDown(text1, text2);
+}
+
+// 983
+int MinCostTicketsDP(int startDay, int idx, vector<int>& days, vector<int>& costs, vector<vector<int>>& dp) {
+    if (idx <= 0 || startDay < 0)
+        return 0;
+
+    if (dp[idx][startDay] != -1)
+        return dp[idx][startDay];
+
+    if (days[idx - 1] >= startDay)
+        return dp[idx][startDay] = MinCostTicketsDP(startDay, idx - 1, days, costs, dp);
+    else {
+        int a = costs[0] + MinCostTicketsDP(days[idx - 1], idx - 1, days, costs, dp);
+        int b = costs[1] + MinCostTicketsDP(days[idx - 1] - 7 + 1, idx - 1, days, costs, dp);
+        int c = costs[2] + MinCostTicketsDP(days[idx - 1] - 30 + 1, idx - 1, days, costs, dp);
+        
+        return dp[idx][startDay] = min(a, min(b, c));
+    }
+}
+
+int MinCostTicketsTopDown(vector<int>& days, vector<int>& costs) {
+    int n = days.size();
+    vector<int> dp(366, 0);
+
+    for (int d = 1, idx = 1; d < 366 && idx <= days.size(); d++) {
+        if (days[idx - 1] != d)
+            dp[d] = dp[d - 1];
+        else {
+            int a = costs[0] + dp[d - 1];
+            int b = costs[1] + (d - 7 >= 0 ? dp[d - 7] : 0);
+            int c = costs[2] + (d - 30 >= 0 ? dp[d - 30] : 0);
+            dp[d] = min({a, b, c});
+            idx++;
+        }
+    }
+
+    return dp[days[n -1]];
+}
+
+int mincostTickets(vector<int>& days, vector<int>& costs) {
+    //vector<vector<int>> dp(days.size() + 1, vector<int>(367, -1));
+    return MinCostTicketsTopDown(days, costs);
+}
 
 // 322
 int coinChangeTopDown(vector<int>& coins, int amount) {
@@ -982,7 +1250,80 @@ int longestMonotonicSubarray(vector<int>& nums) {
 
 #pragma endregion
 
+#pragma region Random Problems
 
+
+int searchInsert(vector<int>& nums, int target) {
+    int l = 0, r = nums.size();
+
+    while (l < r) {
+        int mid = l + (r - l) / 2;
+        if (target == nums[mid])
+            return mid;
+        else if (target < nums[mid])
+            r = mid;
+        else
+            l = mid + 1;
+    }
+
+    return l;
+}
+
+bool isBadVersion(int val) {
+    return true;
+}
+
+int firstBadVersion(int n) {
+    int l = 0, r = n;
+
+    while (l < r) {
+        int mid = l + (r - l) / 2;
+        if (isBadVersion(mid))
+            r = mid;
+        else
+            l = mid + 1;
+    }
+
+    return l;
+}
+
+int binarySearchTemplate(vector<int> arr, int num) {
+    //sort(arr.begin(), arr.end());
+    int left = 0, right = arr.size();   //  initialize the boundary variables left and right to specify search space. Only one rule: set up the boundary to include all possible elements;
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] > num)     // Design the condition function. This is the most difficult and most beautiful part. 
+            right = mid;
+        else
+            left = mid + 1;
+    }
+
+    return left; // Decide return value.Is it return left or return left - 1 ? Remember this : after exiting the while loop, left is the minimal k​ satisfying the condition function;
+}
+
+void setZeroes(vector<vector<int>>& matrix) {
+    int r = matrix.size(), c = matrix[0].size();
+    vector<int> zeroRow(r, 0), zeroCol(c, 0);
+
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            if (!matrix[i][j]) {
+                zeroRow[i] = 1;
+                zeroCol[j] = 1;
+            }
+        }
+    }
+
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            if (zeroRow[i] || zeroCol[j])
+                matrix[i][j] = 0;
+        }
+    }
+}
+
+#pragma endregion
 
 
 

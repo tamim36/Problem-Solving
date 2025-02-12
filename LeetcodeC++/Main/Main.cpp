@@ -112,8 +112,33 @@ void visualizeMatrix(vector<vector<int>>& grid) {
 
 int main()
 {
-    std::cout << "Hello World!\n";
-    vector<int> vect1{ 1,1,2,2,3,4,2,3 };
+    cout << "Hello world." << endl;
+    cout << endl; 
+    cout << endl;
+    cout << endl;
+    cout << "I am shameha. Now i'm studing in CSE." << endl;
+    cout << 6/3 << endl;
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    vector<int> vect1{ 0, 1, 2, 3, 4, 5, 6, 7 };
     vector<int> vect2 = { 10, 15, 40 };
     vector<char> chvect{ 'A','A','A','B','B','B', 'C','C','C', 'D', 'D', 'E' };
     //int a = Solution::maximumTop(vect, 5);
@@ -169,7 +194,7 @@ int main()
 
     int arr[] = { 5,2,3,1,6,7,2 };
 
-    auto res = findXSum(vect1, 6, 2);
+    // auto res = searchInsert(vect1, 8);
 
     
 
